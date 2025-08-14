@@ -13,25 +13,22 @@ export default function Todo() {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState([]);
 
-  // Add a todo
   const addTodo = () => {
     if (text.trim()) {
       setTodos(prev => [...prev, { id: Date.now().toString(), text }]);
-      setText(""); // clear input
+      setText(""); 
     }
   };
 
-  // Delete a todo
   const deleteTodo = (id) => {
     setTodos(prev => prev.filter(todo => todo.id !== id));
   };
 
-  // Render a single todo
   const renderItem = ({ item }) => (
     <View style={styles.todoItem}>
       <Text style={styles.todoText}>{item.text}</Text>
       <TouchableOpacity onPress={() => deleteTodo(item.id)}>
-        <Text style={styles.deleteBtn}>🗑</Text>
+        <Text style={styles.deleteBtn}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
