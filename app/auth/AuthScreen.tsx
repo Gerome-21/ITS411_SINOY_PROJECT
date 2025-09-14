@@ -1,8 +1,3 @@
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from '@react-native-firebase/auth';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -12,13 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { loginUser, registerUser } from './AuthScreen';
 
 export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const auth = getAuth();
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -29,9 +24,9 @@ export default function AuthScreen() {
     setLoading(true);
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await loginUser(email, password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        await registerUser(email, password);
       }
     } catch (error: any) {
       Alert.alert('Error', error.message);
