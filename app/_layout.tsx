@@ -1,30 +1,43 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import { getAuth, onAuthStateChanged, User } from '@react-native-firebase/auth';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+
+export const useAuth = () => useContext(AuthContext);
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  useEffect(() => {
+    // ✅ Modular API version
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" /> */}
-        <Stack.Screen name="todo" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthContext.Provider value={{ user, loading }}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AuthContext.Provider>
   );
 }

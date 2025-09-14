@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155104134974",
+    "project_id": "its411-sinoy-project",
+    "storage_bucket": "its411-sinoy-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155104134974:android:ca8cc62ca17c7398eb4e6f",
+        "android_client_info": {
+          "package_name": "com.its411.gerome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADVPDEzElfIarZtx5yWQotMzluDKo6b6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
