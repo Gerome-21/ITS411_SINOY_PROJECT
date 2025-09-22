@@ -2,6 +2,7 @@ import { getAuth, onAuthStateChanged, User } from '@react-native-firebase/auth';
 import { Stack } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 interface AuthContextType {
   user: User | null;
@@ -36,8 +37,13 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
-      <Stack screenOptions={{ headerShown: false }} />
-    </AuthContext.Provider>
+    <SafeAreaProvider>
+      <SafeAreaView style={{flex: 1, backgroundColor:"black"}}>
+        <AuthContext.Provider value={{ user, loading }}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </AuthContext.Provider>
+      </SafeAreaView>
+    </SafeAreaProvider>
+    
   );
 }
