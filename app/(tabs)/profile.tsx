@@ -49,7 +49,7 @@ export default function Profile() {
       //   return;
       // }
       await signOut(auth);
-      router.replace('/auth/AuthScreen');
+      router.replace('/auth/AuthScreen1');
     } catch (error: any) {
       Alert.alert('Error', error.message);
     }

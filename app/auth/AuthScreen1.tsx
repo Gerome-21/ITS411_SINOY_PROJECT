@@ -13,7 +13,7 @@ import {
   View
 } from 'react-native';
 
-export default function AuthScreen() {
+export default function AuthScreen1() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);

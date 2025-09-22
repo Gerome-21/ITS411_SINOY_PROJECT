@@ -3,7 +3,7 @@ import { Redirect } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from './_layout';
-import AuthScreen from './auth/AuthScreen';
+import AuthScreen1 from './auth/AuthScreen1';
 import ProfileSetup from './profile/ProfileSetup';
 
 export default function App() {
@@ -47,7 +47,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <AuthScreen />;
+    return <AuthScreen1/>;
   }
 
   if (!profileCompleted) {
