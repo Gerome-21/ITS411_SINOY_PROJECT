@@ -33,7 +33,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen 
         name='createMemory'
-        options={{ tabBarIcon: ({size, color}) => <Ionicons name='add-circle' size={size} color={COLOR.primary}/>}} 
+        options={{ tabBarIcon: ({size,}) => <Ionicons name='add-circle' size={size} color={COLOR.primary}/>}} 
       />
       <Tabs.Screen 
         name='calendar'
