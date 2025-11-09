@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { COLOR } from "../constants/colorPalette";
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'white' },
+  container: { flex: 1, padding: 30, backgroundColor: COLOR.background },
 
   title: {
     fontSize: 26,
@@ -50,5 +50,13 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logo: {
+    width: 300, 
+    height: 102, 
   },
 });

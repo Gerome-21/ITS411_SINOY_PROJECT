@@ -147,29 +147,48 @@ export default function AlbumDetails() {
 
       {/* Memory Media */}
       {item.media && item.media.length > 0 && (
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          style={styles.mediaScrollView}
-        >
-          {item.media.map((mediaItem, index) => (
-            <View key={index} style={styles.mediaContainer}>
-              {mediaItem.type === 'image' ? (
-                <Image 
-                  source={{ uri: mediaItem.uri }} 
-                  style={styles.mediaImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={styles.videoPlaceholder}>
-                  <Text style={styles.videoIcon}>🎥</Text>
-                  <Text style={styles.videoText}>Video</Text>
-                </View>
-              )}
-            </View>
-          ))}
-        </ScrollView>
-      )}
+  <ScrollView 
+    horizontal 
+    showsHorizontalScrollIndicator={false}
+    style={styles.mediaScrollView}
+  >
+    {item.media.map((mediaItem, index) => (
+      <TouchableOpacity 
+        key={index}
+        style={styles.mediaContainer}
+        onPress={() => {
+          router.push({
+            pathname: '/components/media-viewer',
+            params: {
+              media: JSON.stringify(item.media),
+              initialIndex: index,
+              memoryTitle: item.title
+            }
+          });
+        }}
+      >
+        {mediaItem.type === 'image' ? (
+          <Image 
+            source={{ uri: mediaItem.uri }} 
+            style={styles.mediaImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.videoPlaceholder}>
+            <Text style={styles.videoIcon}>🎥</Text>
+            <Text style={styles.videoText}>Video</Text>
+          </View>
+        )}
+        {/* Video indicator badge */}
+        {mediaItem.type === 'video' && (
+          <View style={styles.videoBadge}>
+            <Text style={styles.videoBadgeText}>VIDEO</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    ))}
+  </ScrollView>
+)}
 
       {/* Memory Footer */}
       <View style={styles.memoryFooter}>

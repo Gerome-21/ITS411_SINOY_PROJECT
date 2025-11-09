@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   ScrollView,
   Text,
   TextInput,
@@ -55,6 +56,14 @@ export default function ProfileSetup() {
 
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      {/* Logo at the top */}
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('@/assets/images/memoireLOGO.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
       <Text style={styles.title}>Complete Your Profile</Text>
       <Text style={styles.description}>Tell us a bit about yourself</Text>
 
@@ -63,8 +72,9 @@ export default function ProfileSetup() {
         <Text style={styles.label}>Name *</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your full name"
+          placeholder="Name"
           value={name}
+          placeholderTextColor="#999"
           onChangeText={setName}
         />
       </View>
@@ -74,9 +84,10 @@ export default function ProfileSetup() {
         <Text style={styles.label}>Age *</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your age"
+          placeholder="Age"
           value={age}
           onChangeText={setAge}
+          placeholderTextColor="#999"
           keyboardType="numeric"
         />
       </View>
@@ -86,8 +97,9 @@ export default function ProfileSetup() {
         <Text style={styles.label}>Gender (Optional)</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your gender"
+          placeholder="Gender"
           value={gender}
+          placeholderTextColor="#999"
           onChangeText={setGender}
         />
       </View>

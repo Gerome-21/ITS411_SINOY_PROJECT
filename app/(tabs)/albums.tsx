@@ -115,19 +115,19 @@ export default function Albums() {
     }
   };
 
-  const handleAlbumPress = (album: (Album & { actualMemoryCount: number }) | 'uncategorized') => {
-  if (album === 'uncategorized') {
-    router.push({
-      pathname: '/(tabs)/album-details',
-      params: { albumId: 'uncategorized', albumName: 'Uncategorized' }
-    });
-  } else {
-    router.push({
-      pathname: '/(tabs)/album-details',
-      params: { albumId: album.id!, albumName: album.name }
-    });
-  }
-};
+    const handleAlbumPress = (album: (Album & { actualMemoryCount: number }) | 'uncategorized') => {
+      if (album === 'uncategorized') {
+        router.push({
+          pathname: '/components/album-details',  // Correct path
+          params: { albumId: 'uncategorized', albumName: 'Uncategorized' }
+        });
+      } else {
+        router.push({
+          pathname: '/components/album-details',  // Correct path
+          params: { albumId: album.id!, albumName: album.name }
+        });
+      }
+    };
 
   const renderAlbumItem = ({ item, index }: { item: (Album & { actualMemoryCount: number }) | 'uncategorized'; index: number }) => {
     const isUncategorized = item === 'uncategorized';

@@ -7,6 +7,7 @@ import {
 import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   Text,
   TextInput,
   TouchableOpacity,
@@ -42,7 +43,26 @@ export default function AuthScreen1() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{isLogin ? 'Login' : 'Sign Up'}</Text>
+      {/* Logo at the top */}
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('@/assets/images/memoireLOGO.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      {/* Login/Sign Up Image */}
+      <View style={styles.titleImageContainer}>
+        <Image 
+          source={isLogin 
+            ? require('@/assets/images/logInIMG.png')
+            : require('@/assets/images/signInIMG.png')
+          }
+          style={styles.titleImage}
+          resizeMode="contain"
+        />
+      </View>
 
       <TextInput
         style={styles.input}
@@ -51,6 +71,7 @@ export default function AuthScreen1() {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#999"
       />
 
       <TextInput
@@ -59,21 +80,25 @@ export default function AuthScreen1() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        placeholderTextColor="#999"
       />
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleAuth}
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up'}
+          {loading ? 'Loading...' : isLogin ? 'Log In' : 'Join Now'}
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+      <TouchableOpacity 
+        style={styles.switchContainer}
+        onPress={() => setIsLogin(!isLogin)}
+      >
         <Text style={styles.switchText}>
-          {isLogin ? 'Need an account? Sign up' : 'Have an account? Login'}
+          {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Log In'} 
         </Text>
       </TouchableOpacity>
     </View>

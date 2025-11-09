@@ -1,6 +1,7 @@
 export const COLOR = {
-  primary: "#FFB5A7",
-  secondary: "#FCD5CE",
-  background: "#F8EDEB",
-  inactive: "#9CA3AF"
+  primary: "#C39BD3", // light purple 
+  secondary: "#3F1D38", //maroon type
+  background: "#FCF4FF", //more light purple
+  inactive: "#B0ABB3",
+  link: "#B0C3FF"
 } as const

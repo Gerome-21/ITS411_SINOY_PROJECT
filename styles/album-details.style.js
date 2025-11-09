@@ -164,4 +164,18 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+  videoBadge: {
+  position: 'absolute',
+  top: 5,
+  right: 5,
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 4,
+},
+videoBadgeText: {
+  color: '#fff',
+  fontSize: 10,
+  fontWeight: 'bold',
+},
 });
