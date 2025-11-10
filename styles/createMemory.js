@@ -1,11 +1,12 @@
 // styles/createMemory.ts
+import { COLOR } from '@/constants/colorPalette';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: COLOR.background,
   },
   title: {
     fontSize: 24,

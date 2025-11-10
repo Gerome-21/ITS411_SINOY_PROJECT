@@ -61,7 +61,7 @@ export default function CreateMemory() {
         where('userId', '==', auth.currentUser.uid)
       );
       const snapshot = await getDocs(albumsQuery);
-      const userAlbums = snapshot.docs.map(doc => ({
+      const userAlbums = snapshot.docs.map((doc: { id: any; data: () => any; }) => ({
         id: doc.id,
         ...doc.data()
       })) as Album[];

@@ -35,74 +35,55 @@ const UserProfileCard = () => {
 
   // Fetch daily quote
   const fetchDailyQuote = async () => {
-    const todayKey = getTodayKey();
-    
-    // Check if we have a cached quote for today
-    if (quoteCache.current && quoteCache.current.date === todayKey) {
-      setDailyQuote(quoteCache.current.quote);
-      return;
-    }
+  const todayKey = getTodayKey();
 
-    setQuoteLoading(true);
-    
-    try {
-      // Using Quotable API - free and no API key required
-      const response = await fetch('https://zenquotes.io/api/random');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch quote');
+  if (quoteCache.current && quoteCache.current.date === todayKey) {
+    setDailyQuote(quoteCache.current.quote);
+    return;
+  }
+
+  setQuoteLoading(true);
+
+  // List of reliable APIs
+  const apis = [
+    { url: 'https://zenquotes.io/api/random', parse: (data: any) => ({ content: data[0].q, author: data[0].a }) },
+    { url: 'https://type.fit/api/quotes', parse: (data: any) => {
+        const random = data[Math.floor(Math.random() * data.length)];
+        return { content: random.text, author: random.author || "Unknown" };
       }
-      
+    },
+    { url: 'https://api.quotable.io/random', parse: (data: any) => ({ content: data.content, author: data.author }) },
+  ];
+
+  let newQuote = null;
+
+  for (const api of apis) {
+    try {
+      const response = await fetch(api.url);
+      if (!response.ok) continue;
       const data = await response.json();
-      
-      const newQuote = {
-        content: data[0].q,
-        author: data[0].a,
-      };
-      
-      setDailyQuote(newQuote);
-      // Cache the quote in memory for today
-      quoteCache.current = {
-        date: todayKey,
-        quote: newQuote
-      };
-    } catch (error) {
-      console.error('Error fetching quote:', error);
-      // Fallback quotes
-      const fallbackQuotes: Quote[] = [
-        {
-          content: "The only way to do great work is to love what you do.",
-          author: "Steve Jobs"
-        },
-        {
-          content: "Life is what happens when you're busy making other plans.",
-          author: "John Lennon"
-        },
-        {
-          content: "The future belongs to those who believe in the beauty of their dreams.",
-          author: "Eleanor Roosevelt"
-        },
-        {
-          content: "Be the change you wish to see in the world.",
-          author: "Mahatma Gandhi"
-        },
-        {
-          content: "The journey of a thousand miles begins with one step.",
-          author: "Lao Tzu"
-        }
-      ];
-      const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-      setDailyQuote(randomQuote);
-      
-      // Cache fallback quote too
-      quoteCache.current = {
-        date: todayKey,
-        quote: randomQuote
-      };
-    } finally {
-      setQuoteLoading(false);
+      newQuote = api.parse(data);
+      break;
+    } catch (err) {
+      console.warn(`Failed to fetch from ${api.url}`);
     }
-  };
+  }
+
+  if (!newQuote) {
+    // fallback quotes
+    const fallbackQuotes: Quote[] = [
+      { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { content: "Be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+      { content: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+    ];
+    newQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+  }
+
+  setDailyQuote(newQuote);
+  quoteCache.current = { date: todayKey, quote: newQuote };
+  setQuoteLoading(false);
+};
+
 
   // Fetch user profile
   useEffect(() => {

@@ -23,54 +23,6 @@ export default function Index() {
         <View style={styles.contentPlaceholder}>
           {/* Add your future content here */}
           <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          <Text >Hello,!</Text>
-          
         </View>
       </ScrollView>
     </View>
