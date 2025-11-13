@@ -5,14 +5,18 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: COLOR.background,
+  },
+  scrollArea: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 120,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '500',
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   label: {
     fontSize: 16,
@@ -22,38 +26,38 @@ export const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLOR.primary,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
   },
   textArea: {
-    height: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
   dateButton: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLOR.primary,
     borderRadius: 8,
     padding: 12,
   },
   dropdown: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLOR.primary,
     borderRadius: 8,
     padding: 12,
   },
   modal: {
     position: 'absolute',
-    top: 100,
-    left: 20,
-    right: 20,
+    top: 380,
+    left: 0,
+    right: 0,
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    maxHeight: 200,
     zIndex: 1000,
+    maxHeight: 250, // a little taller for better view
   },
   albumOption: {
     padding: 15,
@@ -65,12 +69,12 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLOR.primary,
     marginRight: 8,
   },
   feelingButtonSelected: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: COLOR.primary,
+    borderColor: COLOR.background,
   },
   mediaButtons: {
     flexDirection: 'row',
@@ -78,7 +82,7 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mediaButton: {
-    padding: 12,
+    padding: 30,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
@@ -103,10 +107,11 @@ export const styles = StyleSheet.create({
   mediaPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLOR.primary,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    opacity:0.5
   },
   removeMedia: {
     position: 'absolute',
@@ -124,7 +129,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: COLOR.secondary,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -139,4 +144,36 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  createAlbumButton: {
+  borderWidth: 1,
+  borderColor: COLOR.primary,
+  borderRadius: 8,
+  padding: 12,
+  marginTop: 8,
+  backgroundColor: 'transparent',
+},
+createAlbumButtonText: {
+  color: COLOR.primary,
+  textAlign: 'center',
+  fontWeight: '600',
+},
+  modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.4)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  backgroundColor: 'white',
+  borderRadius: 10,
+  width: '85%',
+  maxHeight: 400,
+  borderWidth: 1,
+  borderColor: '#ddd',
+  overflow: 'hidden',
+},
+albumScroll: {
+  maxHeight: 400,
+},
+
 });

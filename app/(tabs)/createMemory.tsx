@@ -1,4 +1,6 @@
 // app/(tabs)/createMemory.tsx
+import { COLOR } from '@/constants/colorPalette';
+import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getAuth } from '@react-native-firebase/auth';
 import { addDoc, collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore';
@@ -17,16 +19,39 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/createMemory';
 import { Album, FeelingType, Memory } from '../../types/memory';
+import AlbumSelectorModal from '../components/AlbumSelectorModal';
+import AppHeader from '../components/appHeader';
 
 const FEELINGS: { value: FeelingType; label: string }[] = [
+  // Positive Feelings
   { value: 'happy', label: '😊 Happy' },
-  { value: 'sad', label: '😢 Sad' },
+  { value: 'excited', label: '🤩 Excited' },
+  { value: 'grateful', label: '🙏 Grateful' },
   { value: 'loved', label: '❤️ Loved' },
-  { value: 'fear', label: '😨 Fear' },
-  { value: 'surprised', label: '😲 Surprised' },
+  { value: 'motivated', label: '🔥 Motivated' },
+  { value: 'relaxed', label: '😌 Relaxed' },
+  { value: 'hopeful', label: '🌈 Hopeful' },
   { value: 'inspired', label: '💡 Inspired' },
+  { value: 'proud', label: '🏆 Proud' },
+
+  // Neutral or Mixed Feelings
   { value: 'bored', label: '😴 Bored' },
+  { value: 'curious', label: '🧐 Curious' },
+  { value: 'thoughtful', label: '🤔 Thoughtful' },
+  { value: 'nostalgic', label: '📸 Nostalgic' },
+  { value: 'calm', label: '🌿 Calm' },
+
+  // Negative Feelings
+  { value: 'sad', label: '😢 Sad' },
+  { value: 'angry', label: '😠 Angry' },
+  { value: 'anxious', label: '😰 Anxious' },
+  { value: 'fear', label: '😨 Fear' },
+  { value: 'lonely', label: '😔 Lonely' },
+  { value: 'confused', label: '😕 Confused' },
+  { value: 'tired', label: '🥱 Tired' },
+  { value: 'disappointed', label: '😞 Disappointed' },
 ];
+
 
 export default function CreateMemory() {
   const auth = getAuth();
@@ -224,193 +249,190 @@ export default function CreateMemory() {
 
   // Rest of your component JSX remains the same...
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Create New Memory</Text>
-
-      {/* Title */}
-      <Text style={styles.label}>Title *</Text>
-      <TextInput
-        style={styles.input}
-        value={formData.title}
-        onChangeText={(text) => setFormData(prev => ({ ...prev, title: text }))}
-        placeholder="Give your memory a title"
-      />
-
-      {/* Description */}
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={formData.description}
-        onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
-        placeholder="Describe this memory..."
-        multiline
-        numberOfLines={3}
-      />
-
-      {/* Date of Memory */}
-      <Text style={styles.label}>Date of Memory</Text>
-      <TouchableOpacity 
-        style={styles.dateButton}
-        onPress={() => setShowDatePicker(true)}
+    <View style={styles.container}>
+      <AppHeader/>
+      
+       <ScrollView 
+        style={styles.scrollArea} 
+        contentContainerStyle={{ paddingBottom: 150 }}
+        showsVerticalScrollIndicator={false}
       >
-        <Text>{formData.dateOfMemory.toLocaleDateString()}</Text>
-      </TouchableOpacity>
+        {/* <Text style={styles.title}>Add Memory</Text> */}
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={formData.dateOfMemory}
-          mode="date"
-          onChange={(event, date) => {
-            setShowDatePicker(false);
-            if (date) {
-              setFormData(prev => ({ ...prev, dateOfMemory: date }));
-            }
-          }}
+        {/* Title */}
+        <Text style={styles.label}>Title *</Text>
+        <TextInput
+          style={styles.input}
+          value={formData.title}
+          onChangeText={(text) => setFormData(prev => ({ ...prev, title: text }))}
+          placeholder="Give your memory a title"
+          placeholderTextColor={COLOR.inactive}
         />
-      )}
 
-      {/* Album Selection */}
-      <Text style={styles.label}>Album</Text>
-      <TouchableOpacity 
-        style={styles.dropdown}
-        onPress={() => setShowAlbumModal(true)}
-      >
-        <Text>{formData.albumName}</Text>
-      </TouchableOpacity>
+        {/* Description */}
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={formData.description}
+          onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
+          placeholder="Describe this memory..."
+          multiline
+          numberOfLines={3}
+          placeholderTextColor={COLOR.inactive}
+        />
 
-      {showAlbumModal && (
-        <View style={styles.modal}>
-          <ScrollView>
-            <TouchableOpacity 
-              style={styles.albumOption}
-              onPress={() => {
-                setFormData(prev => ({ 
-                  ...prev, 
-                  albumId: 'uncategorized', 
-                  albumName: 'Uncategorized',
-                  newAlbumName: '' 
-                }));
-                setShowAlbumModal(false);
-              }}
-            >
-              <Text>Uncategorized</Text>
-            </TouchableOpacity>
+        {/* Date of Memory */}
+        <Text style={styles.label}>Date of Memory</Text>
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text>{formData.dateOfMemory.toLocaleDateString()}</Text>
+        </TouchableOpacity>
 
-            {albums.map(album => (
-              <TouchableOpacity 
-                key={album.id}
-                style={styles.albumOption}
-                onPress={() => {
-                  setFormData(prev => ({ 
-                    ...prev, 
-                    albumId: album.id!, 
-                    albumName: album.name,
-                    newAlbumName: '' 
-                  }));
-                  setShowAlbumModal(false);
-                }}
-              >
-                <Text>{album.name}</Text>
-              </TouchableOpacity>
-            ))}
-
-            <TouchableOpacity 
-              style={styles.albumOption}
-              onPress={() => {
-                setFormData(prev => ({ 
-                  ...prev, 
-                  albumId: 'new', 
-                  albumName: 'Create New Album' 
-                }));
-                setShowAlbumModal(false);
-              }}
-            >
-              <Text>+ Create New Album</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      )}
-
-      {/* New Album Input */}
-      {formData.albumId === 'new' && (
-        <>
-          <Text style={styles.label}>New Album Name</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.newAlbumName}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, newAlbumName: text }))}
-            placeholder="Enter album name"
+        {showDatePicker && (
+          <DateTimePicker
+            value={formData.dateOfMemory}
+            mode="date"
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) {
+                setFormData(prev => ({ ...prev, dateOfMemory: date }));
+              }
+            }}
           />
-        </>
-      )}
+        )}
 
-      {/* Feeling Selection */}
-      <Text style={styles.label}>Feeling</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {FEELINGS.map((feeling) => (
-          <TouchableOpacity
-            key={feeling.value}
-            style={[
-              styles.feelingButton,
-              formData.feeling === feeling.value && styles.feelingButtonSelected
-            ]}
-            onPress={() => setFormData(prev => ({ ...prev, feeling: feeling.value }))}
+        {/* Album Selection */}
+        <Text style={styles.label}>Album</Text>
+        <TouchableOpacity 
+          style={styles.dropdown}
+          onPress={() => setShowAlbumModal(true)}
+        >
+          <Text>{formData.albumName}</Text>
+        </TouchableOpacity>
+
+        {/* Add this ALWAYS VISIBLE "Create New Album" button */}
+        <TouchableOpacity 
+          style={styles.createAlbumButton}
+          onPress={() => {
+            setFormData(prev => ({ 
+              ...prev, 
+              albumId: 'new', 
+              albumName: 'Create New Album' 
+            }));
+            setShowAlbumModal(false);
+          }}
+        >
+          <Text style={styles.createAlbumButtonText}>+ Create New Album</Text>
+        </TouchableOpacity>
+
+        <AlbumSelectorModal
+  visible={showAlbumModal}
+  albums={albums}
+  onClose={() => setShowAlbumModal(false)}
+  onSelect={(album) => {
+    setFormData((prev) => ({
+      ...prev,
+      albumId: album?.id || 'uncategorized',
+      albumName: album?.name || 'Uncategorized',
+      newAlbumName: '',
+    }));
+  }}
+  onCreateNew={() => {
+    setFormData((prev) => ({
+      ...prev,
+      albumId: 'new',
+      albumName: 'Create New Album',
+    }));
+    setShowAlbumModal(false);
+  }}
+/>
+
+
+        {/* New Album Input */}
+        {formData.albumId === 'new' && (
+          <>
+            <Text style={styles.label}>New Album Name</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.newAlbumName}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, newAlbumName: text }))}
+              placeholder="Enter album name"
+            />
+          </>
+        )}
+
+        {/* Feeling Selection */}
+        <Text style={styles.label}>Feeling</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {FEELINGS.map((feeling) => (
+            <TouchableOpacity
+              key={feeling.value}
+              style={[
+                styles.feelingButton,
+                formData.feeling === feeling.value && styles.feelingButtonSelected
+              ]}
+              onPress={() => setFormData(prev => ({ ...prev, feeling: feeling.value }))}
+            >
+              <Text>{feeling.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Media Upload */}
+        <Text style={styles.label}>Upload Media *</Text>
+        <View style={styles.mediaButtons}>
+          <TouchableOpacity 
+            style={styles.mediaButton}
+            onPress={() => pickMedia('image')}
           >
-            <Text>{feeling.label}</Text>
+            <Ionicons name='image' size={20} color={COLOR.primary}/> 
           </TouchableOpacity>
-        ))}
+          <TouchableOpacity 
+            style={styles.mediaButton}
+            onPress={() => pickMedia('video')}
+          >
+            <Ionicons name='videocam' size={20} color={COLOR.primary}/>
+          </TouchableOpacity>
+        </View>
+
+        {/* Media Preview */}
+        <View style={styles.mediaPreview}>
+          {media.map((item, index) => (
+            <View key={index} style={styles.mediaItem}>
+              {item.type === 'image' ? (
+                <Image source={{ uri: item.uri }} style={styles.mediaImage} />
+              ) : (
+                <View style={styles.mediaPlaceholder}>
+                  <Ionicons name='play-circle-outline' size={30}/>
+                </View>
+              )}
+              <TouchableOpacity 
+                style={styles.removeMedia}
+                onPress={() => removeMedia(index)}
+              >
+                <Text style={styles.removeText}>×</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        {/* Submit Button */}
+        <TouchableOpacity 
+          style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitButtonText}>Save Memory</Text>
+          )}
+        </TouchableOpacity>
       </ScrollView>
 
-      {/* Media Upload */}
-      <Text style={styles.label}>Upload Media *</Text>
-      <View style={styles.mediaButtons}>
-        <TouchableOpacity 
-          style={styles.mediaButton}
-          onPress={() => pickMedia('image')}
-        >
-          <Text>📷 Photos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.mediaButton}
-          onPress={() => pickMedia('video')}
-        >
-          <Text>🎥 Videos</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Media Preview */}
-      <View style={styles.mediaPreview}>
-        {media.map((item, index) => (
-          <View key={index} style={styles.mediaItem}>
-            {item.type === 'image' ? (
-              <Image source={{ uri: item.uri }} style={styles.mediaImage} />
-            ) : (
-              <View style={styles.mediaPlaceholder}>
-                <Text>🎥 Video</Text>
-              </View>
-            )}
-            <TouchableOpacity 
-              style={styles.removeMedia}
-              onPress={() => removeMedia(index)}
-            >
-              <Text style={styles.removeText}>×</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-
-      {/* Submit Button */}
-      <TouchableOpacity 
-        style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-        onPress={handleSubmit}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitButtonText}>Save Memory</Text>
-        )}
-      </TouchableOpacity>
-    </ScrollView>
+    </View>
+    
   );
 }

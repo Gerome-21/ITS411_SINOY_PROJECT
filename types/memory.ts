@@ -24,11 +24,26 @@ export interface Album {
   createdAt: Date;
 }
 
-export type FeelingType = 
-  | 'happy' 
-  | 'sad' 
-  | 'loved' 
-  | 'fear' 
-  | 'surprised' 
-  | 'inspired' 
-  | 'bored';
+export type FeelingType =
+  | 'happy'
+  | 'excited'
+  | 'grateful'
+  | 'loved'
+  | 'motivated'
+  | 'relaxed'
+  | 'hopeful'
+  | 'inspired'
+  | 'proud'
+  | 'bored'
+  | 'curious'
+  | 'thoughtful'
+  | 'nostalgic'
+  | 'calm'
+  | 'sad'
+  | 'angry'
+  | 'anxious'
+  | 'fear'
+  | 'lonely'
+  | 'confused'
+  | 'tired'
+  | 'disappointed';

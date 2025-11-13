@@ -1,4 +1,4 @@
-// styles/album-details.style.ts
+// styles/homeMemories.style.ts
 import { COLOR } from '@/constants/colorPalette';
 import { Dimensions, StyleSheet } from 'react-native';
 
@@ -8,19 +8,30 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    borderRadius: 14,
+    paddingTop: 100,
+    paddingBottom: 50,
+    flexGrow: 1,
+    gap: 30
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   loadingText: {
     marginTop: 10,
     textAlign: 'center',
     color: '#666',
   },
-  albumHeader: {
+  header: {
     backgroundColor: COLOR.background,
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  albumTitle: {
+  headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: COLOR.secondary,
@@ -33,12 +44,22 @@ export const styles = StyleSheet.create({
   memoriesList: {
     padding: 20,
   },
+  section: {
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLOR.inactive,
+    marginBottom: 25,
+    paddingLeft: 10,
+  },
   memoryCard: {
     backgroundColor: COLOR.background,
     borderRadius: 12,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: COLOR.secondary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -79,7 +100,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: COLOR.secondary,
     lineHeight: 20,
-    marginBottom: 15,
+    marginBottom: 8,
   },
   mediaScrollView: {
     marginBottom: 15,
@@ -114,13 +135,13 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: '#fff',
     paddingTop: 10,
   },
   albumBadge: {
-    fontSize: 12,
+    fontSize: 10,
     color: COLOR.primary,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -167,7 +188,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createMemoryButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: COLOR.secondary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
@@ -178,17 +199,17 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   videoBadge: {
-  position: 'absolute',
-  top: 5,
-  right: 5,
-  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  paddingHorizontal: 6,
-  paddingVertical: 2,
-  borderRadius: 4,
-},
-videoBadgeText: {
-  color: '#fff',
-  fontSize: 10,
-  fontWeight: 'bold',
-},
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  videoBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
 });

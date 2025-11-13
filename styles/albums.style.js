@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 120, // Space for fixed header
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   pageTitle: {
     fontSize: 28,

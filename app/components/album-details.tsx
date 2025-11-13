@@ -1,4 +1,6 @@
 // app/(tabs)/album-details.tsx
+import { COLOR } from '@/constants/colorPalette';
+import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from '@react-native-firebase/auth';
 import { collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
@@ -57,7 +59,7 @@ export default function AlbumDetails() {
 
       const snapshot = await getDocs(memoriesQuery);
       
-      const albumMemories = snapshot.docs.map(doc => {
+      const albumMemories = snapshot.docs.map((doc: { data: () => any; id: any; }) => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -94,7 +96,7 @@ export default function AlbumDetails() {
       if (date?.toDate) {
         return date.toDate().toLocaleDateString('en-US', {
           year: 'numeric',
-          month: 'long',
+          month: 'short',
           day: 'numeric'
         });
       } else if (date) {
@@ -113,17 +115,34 @@ export default function AlbumDetails() {
   };
 
   const getFeelingEmoji = (feeling: string) => {
-    const feelingMap: { [key: string]: string } = {
-      'happy': '😊',
-      'sad': '😢',
-      'loved': '❤️',
-      'fear': '😨',
-      'surprised': '😲',
-      'inspired': '💡',
-      'bored': '😴'
-    };
-    return feelingMap[feeling] || '😊';
+  const feelingMap: { [key: string]: string } = {
+    happy: '😊',
+    excited: '🤩',
+    grateful: '🙏',
+    loved: '❤️',
+    motivated: '🔥',
+    relaxed: '😌',
+    hopeful: '🌈',
+    inspired: '💡',
+    proud: '🏆',
+    bored: '😴',
+    curious: '🧐',
+    thoughtful: '🤔',
+    nostalgic: '📸',
+    calm: '🌿',
+    sad: '😢',
+    angry: '😠',
+    anxious: '😰',
+    fear: '😨',
+    lonely: '😔',
+    confused: '😕',
+    tired: '🥱',
+    disappointed: '😞',
   };
+
+  return feelingMap[feeling] || '😊';
+};
+
 
   const renderMemoryItem = ({ item }: { item: Memory }) => (
     <View style={styles.memoryCard}>
@@ -131,71 +150,77 @@ export default function AlbumDetails() {
       <View style={styles.memoryHeader}>
         <View style={styles.memoryInfo}>
           <Text style={styles.memoryTitle}>{item.title}</Text>
-          <Text style={styles.memoryDate}>{formatDate(item.dateOfMemory)}</Text>
         </View>
         <View style={styles.memoryMeta}>
           <Text style={styles.feelingBadge}>
-            {getFeelingEmoji(item.feeling)} {item.feeling}
+            {getFeelingEmoji(item.feeling)} {/* {item.feeling} */}
           </Text>
         </View>
       </View>
 
+      
+
+      {/* Memory Media */}
+      {item.media && item.media.length > 0 && (
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.mediaScrollView}
+      >
+        {item.media.map((mediaItem, index) => (
+          <TouchableOpacity 
+            key={index}
+            style={styles.mediaContainer}
+            onPress={() => {
+              router.push({
+                pathname: '/components/media-viewer',
+                params: {
+                  media: JSON.stringify(item.media),
+                  initialIndex: index,
+                  memoryTitle: item.title
+                }
+              });
+            }}
+          >
+            {mediaItem.type === 'image' ? (
+              <Image 
+                source={{ uri: mediaItem.uri }} 
+                style={styles.mediaImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.videoPlaceholder}>
+                <Text style={styles.videoIcon}>🎥</Text>
+                <Text style={styles.videoText}>Video</Text>
+              </View>
+            )}
+            {/* Video indicator badge */}
+            {mediaItem.type === 'video' && (
+              <View style={styles.videoBadge}>
+                <Text style={styles.videoBadgeText}>VIDEO</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      )}
+      
       {/* Memory Description */}
       {item.description ? (
         <Text style={styles.memoryDescription}>{item.description}</Text>
       ) : null}
 
-      {/* Memory Media */}
-      {item.media && item.media.length > 0 && (
-  <ScrollView 
-    horizontal 
-    showsHorizontalScrollIndicator={false}
-    style={styles.mediaScrollView}
-  >
-    {item.media.map((mediaItem, index) => (
-      <TouchableOpacity 
-        key={index}
-        style={styles.mediaContainer}
-        onPress={() => {
-          router.push({
-            pathname: '/components/media-viewer',
-            params: {
-              media: JSON.stringify(item.media),
-              initialIndex: index,
-              memoryTitle: item.title
-            }
-          });
-        }}
-      >
-        {mediaItem.type === 'image' ? (
-          <Image 
-            source={{ uri: mediaItem.uri }} 
-            style={styles.mediaImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.videoPlaceholder}>
-            <Text style={styles.videoIcon}>🎥</Text>
-            <Text style={styles.videoText}>Video</Text>
-          </View>
-        )}
-        {/* Video indicator badge */}
-        {mediaItem.type === 'video' && (
-          <View style={styles.videoBadge}>
-            <Text style={styles.videoBadgeText}>VIDEO</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    ))}
-  </ScrollView>
-)}
-
       {/* Memory Footer */}
       <View style={styles.memoryFooter}>
-        <Text style={styles.albumBadge}>From: {item.albumName}</Text>
-        <Text style={styles.createdDate}>
-          Created: {formatDate(item.createdAt)}
-        </Text>
+        <View style={styles.footerItem}>
+          <Ionicons name="file-tray-full-outline" size={16} color={COLOR.inactive} style={styles.footerIcon} />
+          <Text style={styles.albumBadge}>{item.albumName}</Text>
+        </View>
+
+        <View style={styles.footerItem}>
+          <Ionicons name="calendar-outline" size={16} color={COLOR.inactive} style={styles.footerIcon} />
+          <Text style={styles.createdDate}>{formatDate(item.createdAt)}</Text>
+        </View>
       </View>
     </View>
   );
