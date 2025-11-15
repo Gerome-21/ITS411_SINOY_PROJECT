@@ -20,10 +20,11 @@ import { styles } from '../../styles/homeMemories.style';
 import { Memory } from '../../types/memory';
 import UserProfileCard from './userProfileCard';
 
-
 interface GroupedMemories {
   title: string;
   data: Memory[];
+  type: 'anniversary' | 'regular';
+  yearsAgo?: number;
 }
 
 export default function HomeMemories() {
@@ -75,6 +76,37 @@ export default function HomeMemories() {
     }
   };
 
+  const getAnniversaryMemories = (memoriesList: Memory[]) => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+    
+    return memoriesList.filter(memory => {
+      const memoryDate = memory.dateOfMemory?.toDate ? memory.dateOfMemory.toDate() : new Date(memory.dateOfMemory);
+      const memoryMonth = memoryDate.getMonth();
+      const memoryDay = memoryDate.getDate();
+      
+      // Check if it's the same month and day (anniversary)
+      if (memoryMonth === currentMonth && memoryDay === currentDate) {
+        const yearsDiff = now.getFullYear() - memoryDate.getFullYear();
+        return yearsDiff >= 1; // Only return memories that are at least 1 year old
+      }
+      return false;
+    });
+  };
+
+  const getYearsAgo = (memoryDate: Date) => {
+    const now = new Date();
+    const yearsDiff = now.getFullYear() - memoryDate.getFullYear();
+    
+    // Adjust if the anniversary hasn't occurred yet this year
+    const memoryThisYear = new Date(now.getFullYear(), memoryDate.getMonth(), memoryDate.getDate());
+    if (memoryThisYear > now) {
+      return yearsDiff - 1;
+    }
+    return yearsDiff;
+  };
+
   const groupMemoriesByDate = (memoriesList: Memory[]) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -82,12 +114,49 @@ export default function HomeMemories() {
     const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
 
     const groups: GroupedMemories[] = [];
+    
+    // First, get anniversary memories and put them at the top
+    const anniversaryMemories = getAnniversaryMemories(memoriesList);
+    if (anniversaryMemories.length > 0) {
+      // Group anniversary memories by years ago
+      const anniversaryGroups: { [key: number]: Memory[] } = {};
+      
+      anniversaryMemories.forEach(memory => {
+        const memoryDate = memory.dateOfMemory?.toDate ? memory.dateOfMemory.toDate() : new Date(memory.dateOfMemory);
+        const yearsAgo = getYearsAgo(memoryDate);
+        
+        if (!anniversaryGroups[yearsAgo]) {
+          anniversaryGroups[yearsAgo] = [];
+        }
+        anniversaryGroups[yearsAgo].push(memory);
+      });
+
+      // Add anniversary groups in order (oldest first for more impact)
+      Object.keys(anniversaryGroups)
+        .sort((a, b) => parseInt(a) - parseInt(b))
+        .forEach(yearsAgo => {
+          const years = parseInt(yearsAgo);
+          groups.push({
+            title: `On this day ${years} ${years === 1 ? 'year' : 'years'} ago`,
+            data: anniversaryGroups[years],
+            type: 'anniversary',
+            yearsAgo: years
+          });
+        });
+    }
+
+    // Then add regular time-based groups
     const todayMemories: Memory[] = [];
     const thisWeekMemories: Memory[] = [];
     const thisMonthMemories: Memory[] = [];
     const olderMemories: { [key: string]: Memory[] } = {};
 
-    memoriesList.forEach(memory => {
+    // Filter out anniversary memories from regular grouping
+    const regularMemories = memoriesList.filter(memory => 
+      !anniversaryMemories.some(anniversary => anniversary.id === memory.id)
+    );
+
+    regularMemories.forEach(memory => {
       const memoryDate = memory.dateOfMemory?.toDate ? memory.dateOfMemory.toDate() : new Date(memory.dateOfMemory);
       
       if (memoryDate >= today) {
@@ -108,22 +177,22 @@ export default function HomeMemories() {
       }
     });
 
-    // Add groups in order
+    // Add regular groups in order
     if (todayMemories.length > 0) {
-      groups.push({ title: 'Today', data: todayMemories });
+      groups.push({ title: 'Today', data: todayMemories, type: 'regular' });
     }
     if (thisWeekMemories.length > 0) {
-      groups.push({ title: 'This Week', data: thisWeekMemories });
+      groups.push({ title: 'This Week', data: thisWeekMemories, type: 'regular' });
     }
     if (thisMonthMemories.length > 0) {
-      groups.push({ title: 'This Month', data: thisMonthMemories });
+      groups.push({ title: 'This Month', data: thisMonthMemories, type: 'regular' });
     }
 
     // Add older months in chronological order (newest first)
     Object.keys(olderMemories)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .forEach(monthYear => {
-        groups.push({ title: monthYear, data: olderMemories[monthYear] });
+        groups.push({ title: monthYear, data: olderMemories[monthYear], type: 'regular' });
       });
 
     setGroupedMemories(groups);
@@ -185,16 +254,27 @@ export default function HomeMemories() {
     return feelingMap[feeling] || '😊';
   };
 
-  const renderMemoryItem = ({ item }: { item: Memory }) => (
-    <View style={styles.memoryCard}>
+  const renderMemoryItem = ({ item, isAnniversary = false, yearsAgo = 0 }: { item: Memory; isAnniversary?: boolean; yearsAgo?: number }) => (
+    <View style={[styles.memoryCard, isAnniversary && styles.anniversaryCard]}>
+      {/* Anniversary Badge */}
+      {isAnniversary && (
+        <View style={styles.anniversaryBadge}>
+          <Ionicons name="sparkles" size={16} color="#FFD700" />
+          <Text style={styles.anniversaryBadgeText}>
+            {yearsAgo} {yearsAgo === 1 ? 'Year' : 'Years'} Ago
+          </Text>
+          <Ionicons name="sparkles" size={16} color="#FFD700" />
+        </View>
+      )}
+
       {/* Memory Header */}
       <View style={styles.memoryHeader}>
         <View style={styles.memoryInfo}>
-          <Text style={styles.memoryTitle}>{item.title}</Text>
+          <Text style={[styles.memoryTitle, isAnniversary && styles.anniversaryTitle]}>{item.title}</Text>
           {/* <Text style={styles.memoryDate}>{formatDate(item.dateOfMemory)}</Text> */}
         </View>
         <View style={styles.memoryMeta}>
-          <Text style={styles.feelingBadge}>
+          <Text style={[styles.feelingBadge, isAnniversary && styles.anniversaryFeeling]}>
             {getFeelingEmoji(item.feeling)} 
           </Text>
         </View>
@@ -247,31 +327,41 @@ export default function HomeMemories() {
       
       {/* Memory Description */}
       {item.description ? (
-        <Text style={styles.memoryDescription}>{item.description}</Text>
+        <Text style={[styles.memoryDescription, isAnniversary && styles.anniversaryDescription]}>
+          {item.description}
+        </Text>
       ) : null}
 
       {/* Memory Footer */}
       <View style={styles.memoryFooter}>
         <View style={styles.footerItem}>
           <Ionicons name="file-tray-full-outline" size={16} color={COLOR.inactive} style={styles.footerIcon} />
-          <Text style={styles.albumBadge}>{item.albumName}</Text>
+          <Text style={[styles.albumBadge, isAnniversary && styles.anniversaryFooterText]}>{item.albumName}</Text>
         </View>
 
         <View style={styles.footerItem}>
           <Ionicons name="calendar-outline" size={16} color={COLOR.inactive} style={styles.footerIcon} />
-          <Text style={styles.createdDate}>{formatDate(item.createdAt)}</Text>
+          <Text style={[styles.createdDate, isAnniversary && styles.anniversaryFooterText]}>{formatDate(item.dateOfMemory)}</Text>
         </View>
       </View>
-
     </View>
   );
 
   const renderSection = ({ item }: { item: GroupedMemories }) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{item.title}</Text>
+      <Text style={[
+        styles.sectionTitle, 
+        item.type === 'anniversary' && styles.anniversarySectionTitle
+      ]}>
+        {item.title}
+      </Text>
       {item.data.map((memory) => (
         <View key={memory.id}>
-          {renderMemoryItem({ item: memory })}
+          {renderMemoryItem({ 
+            item: memory, 
+            isAnniversary: item.type === 'anniversary',
+            yearsAgo: item.yearsAgo 
+          })}
         </View>
       ))}
     </View>
@@ -307,7 +397,7 @@ export default function HomeMemories() {
         <FlatList
           data={groupedMemories}
           renderItem={renderSection}
-          keyExtractor={(item) => item.title}
+          keyExtractor={(item) => `${item.type}-${item.title}`}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.memoriesList}
           refreshControl={

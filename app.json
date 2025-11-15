@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ITS411_PROJECTT1",
-    "slug": "ITS411_PROJECTT1",
+    "slug": "its411projectt1",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cb2a10c4-2151-400f-bfea-78728019a11d"
+      }
+    },
+    "owner": "gerome14"
   }
 }

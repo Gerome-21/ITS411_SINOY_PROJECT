@@ -54,6 +54,13 @@ export const styles = StyleSheet.create({
     marginBottom: 25,
     paddingLeft: 10,
   },
+  anniversarySectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLOR.primary,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
   memoryCard: {
     backgroundColor: COLOR.background,
     borderRadius: 12,
@@ -64,6 +71,33 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  anniversaryCard: {
+    backgroundColor: COLOR.background,
+    borderWidth: 2,
+    borderColor: COLOR.primary,
+    shadowColor: COLOR.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  anniversaryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLOR.background,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 12,
+    alignSelf: 'center',
+  },
+  anniversaryBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLOR.primary,
+    marginHorizontal: 6,
   },
   memoryHeader: {
     flexDirection: 'row',
@@ -79,6 +113,10 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
+  },
+  anniversaryTitle: {
+    color: COLOR.secondary,
+    fontSize: 20,
   },
   memoryDate: {
     fontSize: 14,
@@ -96,11 +134,20 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLOR.secondary,
   },
+  anniversaryFeeling: {
+    backgroundColor: '#fff',
+    color: COLOR.primary,
+  },
   memoryDescription: {
     fontSize: 14,
     color: COLOR.secondary,
     lineHeight: 20,
     marginBottom: 8,
+  },
+  anniversaryDescription: {
+    color: COLOR.secondary,
+    fontSize: 14,
+    lineHeight: 20
   },
   mediaScrollView: {
     marginBottom: 15,
@@ -153,6 +200,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+  },
+  anniversaryFooterText: {
+    backgroundColor: '#FFF',
+    color: COLOR.primary,
   },
   footerItem: {
     flexDirection: 'row',
