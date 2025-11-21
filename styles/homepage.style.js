@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLOR.background,
-    padding:5
+    padding:10
   },
   // scrollView: {
   //   flex: 1,

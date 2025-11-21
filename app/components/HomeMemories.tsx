@@ -18,6 +18,8 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/homeMemories.style';
 import { Memory } from '../../types/memory';
+import EditMemory from './EditMemory'; // ADD THIS IMPORT
+import MemoryDetailView from './MemoryDetailView';
 import UserProfileCard from './userProfileCard';
 
 interface GroupedMemories {
@@ -31,6 +33,11 @@ export default function HomeMemories() {
   const router = useRouter();
   const auth = getAuth();
   const db = getFirestore();
+
+  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [editingMemory, setEditingMemory] = useState<Memory | null>(null); // ADD THIS STATE
+  const [editModalVisible, setEditModalVisible] = useState(false); // ADD THIS STATE
   
   const [memories, setMemories] = useState<Memory[]>([]);
   const [groupedMemories, setGroupedMemories] = useState<GroupedMemories[]>([]);
@@ -254,8 +261,39 @@ export default function HomeMemories() {
     return feelingMap[feeling] || '😊';
   };
 
+  // FIXED: Properly handle memory update
+  const handleMemoryUpdate = (updatedMemory: Memory) => {
+    const updatedList = memories.map(mem => 
+      mem.id === updatedMemory.id ? updatedMemory : mem
+    );
+    setMemories(updatedList);
+    // Re-group memories to reflect changes
+    groupMemoriesByDate(updatedList);
+  };
+
+  // FIXED: Properly handle memory delete
+  const handleMemoryDelete = (memoryId: string) => {
+    const updatedList = memories.filter(mem => mem.id !== memoryId);
+    setMemories(updatedList);
+    // Re-group memories to reflect changes
+    groupMemoriesByDate(updatedList);
+  };
+
+  // ADD THIS FUNCTION: Handle edit memory requests
+  const handleEditMemory = (memory: Memory) => {
+    setEditingMemory(memory);
+    setEditModalVisible(true);
+  };
+
+  // FIXED: Removed nested TouchableOpacity and View
   const renderMemoryItem = ({ item, isAnniversary = false, yearsAgo = 0 }: { item: Memory; isAnniversary?: boolean; yearsAgo?: number }) => (
-    <View style={[styles.memoryCard, isAnniversary && styles.anniversaryCard]}>
+    <TouchableOpacity 
+      style={[styles.memoryCard, isAnniversary && styles.anniversaryCard]}
+      onPress={() => {
+        setSelectedMemory(item);
+        setDetailVisible(true);
+      }}
+    >
       {/* Anniversary Badge */}
       {isAnniversary && (
         <View style={styles.anniversaryBadge}>
@@ -271,7 +309,6 @@ export default function HomeMemories() {
       <View style={styles.memoryHeader}>
         <View style={styles.memoryInfo}>
           <Text style={[styles.memoryTitle, isAnniversary && styles.anniversaryTitle]}>{item.title}</Text>
-          {/* <Text style={styles.memoryDate}>{formatDate(item.dateOfMemory)}</Text> */}
         </View>
         <View style={styles.memoryMeta}>
           <Text style={[styles.feelingBadge, isAnniversary && styles.anniversaryFeeling]}>
@@ -344,7 +381,7 @@ export default function HomeMemories() {
           <Text style={[styles.createdDate, isAnniversary && styles.anniversaryFooterText]}>{formatDate(item.dateOfMemory)}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity> 
   );
 
   const renderSection = ({ item }: { item: GroupedMemories }) => (
@@ -379,20 +416,47 @@ export default function HomeMemories() {
   return (
     <View style={styles.container}>
       {memories.length === 0 ? (
-        <View style={styles.emptyState}>
-          <UserProfileCard/>
-          <Text style={styles.emptyStateIcon}>📔</Text>
-          <Text style={styles.emptyStateText}>No memories yet</Text>
-          <Text style={styles.emptyStateSubtext}>
-            Start capturing your precious moments by creating your first memory
-          </Text>
-          <TouchableOpacity 
-            style={styles.createMemoryButton}
-            onPress={() => router.push('/(tabs)/createMemory')}
-          >
-            <Text style={styles.createMemoryButtonText}>Create Your First Memory</Text>
-          </TouchableOpacity>
-        </View>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Always on top */}
+          <UserProfileCard />
+
+          {memories.length === 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No memories yet</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Start capturing your precious moments by creating your first memory
+              </Text>
+
+              <TouchableOpacity
+                style={styles.createMemoryButton}
+                onPress={() => router.push('/(tabs)/createMemory')}
+              >
+                <Text style={styles.createMemoryButtonText}>
+                  Create Your First Memory
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={groupedMemories}
+              renderItem={renderSection}
+              keyExtractor={(item) => `${item.type}-${item.title}`}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.memoriesList}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              ListHeaderComponent={<UserProfileCard />}
+            />
+          )}
+        </ScrollView>
       ) : (
         <FlatList
           data={groupedMemories}
@@ -407,7 +471,34 @@ export default function HomeMemories() {
               colors={['#0000ff']}
             />
           }
-          ListHeaderComponent={<UserProfileCard/>}
+          ListHeaderComponent={<UserProfileCard />}
+        />
+      )}
+
+      {/* FIXED: Only render MemoryDetailView when selectedMemory exists */}
+      {selectedMemory && (
+        <MemoryDetailView
+          memory={selectedMemory}
+          visible={detailVisible}
+          onClose={() => {
+            setDetailVisible(false);
+            setSelectedMemory(null);
+          }}
+          onMemoryDelete={handleMemoryDelete}
+          onEditMemory={handleEditMemory} // ADD THIS PROP
+        />
+      )}
+
+      {/* ADD THIS: Edit Memory Modal */}
+      {editingMemory && (
+        <EditMemory
+          memory={editingMemory}
+          visible={editModalVisible}
+          onClose={() => {
+            setEditModalVisible(false);
+            setEditingMemory(null);
+          }}
+          onMemoryUpdate={handleMemoryUpdate}
         />
       )}
     </View>

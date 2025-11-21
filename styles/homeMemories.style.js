@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     textAlign: 'center',
-    color: '#666',
+    color: COLOR.primary,
   },
   header: {
     backgroundColor: COLOR.background,
@@ -139,7 +139,7 @@ export const styles = StyleSheet.create({
     color: COLOR.primary,
   },
   memoryDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLOR.secondary,
     lineHeight: 20,
     marginBottom: 8,
@@ -263,4 +263,12 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
   },
+  emptyStateContainer: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+  marginTop: 50,
+},
+
 });

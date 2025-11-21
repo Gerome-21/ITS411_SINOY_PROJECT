@@ -4,4 +4,4 @@ export const COLOR = {
   background: "#FCF4FF", //more light purple
   inactive: "#B0ABB3",
   link: "#B0C3FF"
-} as const
+} as const 

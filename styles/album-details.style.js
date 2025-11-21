@@ -147,10 +147,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 50,
   },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 20,
-  },
   emptyStateText: {
     fontSize: 18,
     fontWeight: '600',
@@ -167,7 +163,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createMemoryButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: COLOR.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

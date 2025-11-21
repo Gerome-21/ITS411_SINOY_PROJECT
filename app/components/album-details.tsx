@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/album-details.style';
 import { Memory } from '../../types/memory';
+import EditMemory from '../components/EditMemory'; // ADD THIS IMPORT
+import MemoryDetailView from '../components/MemoryDetailView';
 
 export default function AlbumDetails() {
   const { albumId, albumName } = useLocalSearchParams();
@@ -27,6 +29,14 @@ export default function AlbumDetails() {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Add state for memory detail view
+  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [detailVisible, setDetailVisible] = useState(false);
+  
+  // ADD THESE STATES FOR EDIT FUNCTIONALITY
+  const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
     loadAlbumMemories();
@@ -39,7 +49,6 @@ export default function AlbumDetails() {
     }
 
     try {
-      
       // Use the same pattern as your working albumDetails.tsx
       let memoriesQuery;
       
@@ -85,6 +94,26 @@ export default function AlbumDetails() {
     }
   };
 
+  // Add memory update handler
+  const handleMemoryUpdate = (updatedMemory: Memory) => {
+    const updatedList = memories.map(mem => 
+      mem.id === updatedMemory.id ? updatedMemory : mem
+    );
+    setMemories(updatedList);
+  };
+
+  // Add memory delete handler
+  const handleMemoryDelete = (memoryId: string) => {
+    const updatedList = memories.filter(mem => mem.id !== memoryId);
+    setMemories(updatedList);
+  };
+
+  // ADD THIS FUNCTION: Handle edit memory requests
+  const handleEditMemory = (memory: Memory) => {
+    setEditingMemory(memory);
+    setEditModalVisible(true);
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadAlbumMemories();
@@ -115,37 +144,42 @@ export default function AlbumDetails() {
   };
 
   const getFeelingEmoji = (feeling: string) => {
-  const feelingMap: { [key: string]: string } = {
-    happy: '😊',
-    excited: '🤩',
-    grateful: '🙏',
-    loved: '❤️',
-    motivated: '🔥',
-    relaxed: '😌',
-    hopeful: '🌈',
-    inspired: '💡',
-    proud: '🏆',
-    bored: '😴',
-    curious: '🧐',
-    thoughtful: '🤔',
-    nostalgic: '📸',
-    calm: '🌿',
-    sad: '😢',
-    angry: '😠',
-    anxious: '😰',
-    fear: '😨',
-    lonely: '😔',
-    confused: '😕',
-    tired: '🥱',
-    disappointed: '😞',
+    const feelingMap: { [key: string]: string } = {
+      happy: '😊',
+      excited: '🤩',
+      grateful: '🙏',
+      loved: '❤️',
+      motivated: '🔥',
+      relaxed: '😌',
+      hopeful: '🌈',
+      inspired: '💡',
+      proud: '🏆',
+      bored: '😴',
+      curious: '🧐',
+      thoughtful: '🤔',
+      nostalgic: '📸',
+      calm: '🌿',
+      sad: '😢',
+      angry: '😠',
+      anxious: '😰',
+      fear: '😨',
+      lonely: '😔',
+      confused: '😕',
+      tired: '🥱',
+      disappointed: '😞',
+    };
+    return feelingMap[feeling] || '😊';
   };
 
-  return feelingMap[feeling] || '😊';
-};
-
-
+  // Update renderMemoryItem to use TouchableOpacity for the whole card
   const renderMemoryItem = ({ item }: { item: Memory }) => (
-    <View style={styles.memoryCard}>
+    <TouchableOpacity 
+      style={styles.memoryCard}
+      onPress={() => {
+        setSelectedMemory(item);
+        setDetailVisible(true);
+      }}
+    >
       {/* Memory Header */}
       <View style={styles.memoryHeader}>
         <View style={styles.memoryInfo}>
@@ -153,56 +187,55 @@ export default function AlbumDetails() {
         </View>
         <View style={styles.memoryMeta}>
           <Text style={styles.feelingBadge}>
-            {getFeelingEmoji(item.feeling)} {/* {item.feeling} */}
+            {getFeelingEmoji(item.feeling)}
           </Text>
         </View>
       </View>
 
-      
-
       {/* Memory Media */}
       {item.media && item.media.length > 0 && (
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.mediaScrollView}
-      >
-        {item.media.map((mediaItem, index) => (
-          <TouchableOpacity 
-            key={index}
-            style={styles.mediaContainer}
-            onPress={() => {
-              router.push({
-                pathname: '/components/media-viewer',
-                params: {
-                  media: JSON.stringify(item.media),
-                  initialIndex: index,
-                  memoryTitle: item.title
-                }
-              });
-            }}
-          >
-            {mediaItem.type === 'image' ? (
-              <Image 
-                source={{ uri: mediaItem.uri }} 
-                style={styles.mediaImage}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.videoPlaceholder}>
-                <Text style={styles.videoIcon}>🎥</Text>
-                <Text style={styles.videoText}>Video</Text>
-              </View>
-            )}
-            {/* Video indicator badge */}
-            {mediaItem.type === 'video' && (
-              <View style={styles.videoBadge}>
-                <Text style={styles.videoBadgeText}>VIDEO</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.mediaScrollView}
+        >
+          {item.media.map((mediaItem, index) => (
+            <TouchableOpacity 
+              key={index}
+              style={styles.mediaContainer}
+              onPress={(e) => {
+                e.stopPropagation(); // Prevent triggering the parent onPress
+                router.push({
+                  pathname: '/components/media-viewer',
+                  params: {
+                    media: JSON.stringify(item.media),
+                    initialIndex: index,
+                    memoryTitle: item.title
+                  }
+                });
+              }}
+            >
+              {mediaItem.type === 'image' ? (
+                <Image 
+                  source={{ uri: mediaItem.uri }} 
+                  style={styles.mediaImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.videoPlaceholder}>
+                  <Text style={styles.videoIcon}>🎥</Text>
+                  <Text style={styles.videoText}>Video</Text>
+                </View>
+              )}
+              {/* Video indicator badge */}
+              {mediaItem.type === 'video' && (
+                <View style={styles.videoBadge}>
+                  <Text style={styles.videoBadgeText}>VIDEO</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       )}
       
       {/* Memory Description */}
@@ -219,17 +252,17 @@ export default function AlbumDetails() {
 
         <View style={styles.footerItem}>
           <Ionicons name="calendar-outline" size={16} color={COLOR.inactive} style={styles.footerIcon} />
-          <Text style={styles.createdDate}>{formatDate(item.createdAt)}</Text>
+          <Text style={styles.createdDate}>{formatDate(item.dateOfMemory)}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
     return (
       <View style={styles.container}>
         <Stack.Screen options={{ title: 'Loading...' }} />
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={COLOR.primary} />
         <Text style={styles.loadingText}>Loading memories...</Text>
       </View>
     );
@@ -252,7 +285,6 @@ export default function AlbumDetails() {
 
       {memories.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyStateIcon}>📔</Text>
           <Text style={styles.emptyStateText}>No memories yet</Text>
           <Text style={styles.emptyStateSubtext}>
             {albumId === 'uncategorized' 
@@ -276,6 +308,33 @@ export default function AlbumDetails() {
           contentContainerStyle={styles.memoriesList}
           refreshing={refreshing}
           onRefresh={onRefresh}
+        />
+      )}
+
+      {/* Memory Detail View Modal */}
+      {selectedMemory && (
+        <MemoryDetailView
+          memory={selectedMemory}
+          visible={detailVisible}
+          onClose={() => {
+            setDetailVisible(false);
+            setSelectedMemory(null);
+          }}
+          onMemoryDelete={handleMemoryDelete}
+          onEditMemory={handleEditMemory} // ADD THIS PROP
+        />
+      )}
+
+      {/* ADD THIS: Edit Memory Modal */}
+      {editingMemory && (
+        <EditMemory
+          memory={editingMemory}
+          visible={editModalVisible}
+          onClose={() => {
+            setEditModalVisible(false);
+            setEditingMemory(null);
+          }}
+          onMemoryUpdate={handleMemoryUpdate}
         />
       )}
     </View>
