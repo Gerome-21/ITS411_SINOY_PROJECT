@@ -17,8 +17,6 @@ export default function Albums() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Page Title */}
-        {/* <Text style={styles.pageTitle}>My Albums</Text> */}
         
         {/* Albums Grid - grows with content, not scrollable */}
         <AlbumsGrid />
@@ -26,7 +24,7 @@ export default function Albums() {
         {/* Future components will go here and be scrollable */}
         <View style={styles.futureContent}>
           <Text style={styles.futureContentText}>
-            More features coming soon...
+            Shared albums will be appear here
           </Text>
         </View>
       </ScrollView>

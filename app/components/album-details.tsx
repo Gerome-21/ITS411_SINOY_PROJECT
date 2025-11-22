@@ -1,4 +1,5 @@
 // app/(tabs)/album-details.tsx
+//card display uiux on albums tab
 import { COLOR } from '@/constants/colorPalette';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from '@react-native-firebase/auth';
@@ -17,7 +18,7 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/album-details.style';
 import { Memory } from '../../types/memory';
-import EditMemory from '../components/EditMemory'; // ADD THIS IMPORT
+import EditMemory from '../components/EditMemory';
 import MemoryDetailView from '../components/MemoryDetailView';
 
 export default function AlbumDetails() {
@@ -29,6 +30,7 @@ export default function AlbumDetails() {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // ADD: Track image errors
   
   // Add state for memory detail view
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
@@ -41,6 +43,19 @@ export default function AlbumDetails() {
   useEffect(() => {
     loadAlbumMemories();
   }, [albumId]);
+
+  // ADD: Handle image loading errors
+  const handleImageError = (mediaUri: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [mediaUri]: true
+    }));
+  };
+
+  // ADD: Reset image errors when refreshing
+  const resetImageErrors = () => {
+    setImageErrors({});
+  };
 
   const loadAlbumMemories = async () => {
     if (!auth.currentUser) {
@@ -100,6 +115,7 @@ export default function AlbumDetails() {
       mem.id === updatedMemory.id ? updatedMemory : mem
     );
     setMemories(updatedList);
+    resetImageErrors(); // ADD: Reset errors when memory is updated
   };
 
   // Add memory delete handler
@@ -116,6 +132,7 @@ export default function AlbumDetails() {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    resetImageErrors(); // ADD: Reset errors on refresh
     await loadAlbumMemories();
     setRefreshing(false);
   };
@@ -171,7 +188,7 @@ export default function AlbumDetails() {
     return feelingMap[feeling] || '😊';
   };
 
-  // Update renderMemoryItem to use TouchableOpacity for the whole card
+  // UPDATED: Modified renderMemoryItem to include fallback image
   const renderMemoryItem = ({ item }: { item: Memory }) => (
     <TouchableOpacity 
       style={styles.memoryCard}
@@ -217,9 +234,13 @@ export default function AlbumDetails() {
             >
               {mediaItem.type === 'image' ? (
                 <Image 
-                  source={{ uri: mediaItem.uri }} 
+                  source={imageErrors[mediaItem.uri] 
+                    ? require('@/assets/images/fallbackImage.png') 
+                    : { uri: mediaItem.uri }
+                  } 
                   style={styles.mediaImage}
                   resizeMode="cover"
+                  onError={() => handleImageError(mediaItem.uri)}
                 />
               ) : (
                 <View style={styles.videoPlaceholder}>

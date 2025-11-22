@@ -39,6 +39,20 @@ export default function MemoryDetailView({
   const db = getFirestore();
   
   const [loading, setLoading] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // ADD: Track image errors
+
+  // ADD: Handle image loading errors
+  const handleImageError = (mediaUri: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [mediaUri]: true
+    }));
+  };
+
+  // ADD: Reset image errors when modal opens/closes
+  const resetImageErrors = () => {
+    setImageErrors({});
+  };
 
   const getFeelingEmoji = (feeling: string) => {
     const feelingMap: { [key: string]: string } = {
@@ -144,6 +158,13 @@ export default function MemoryDetailView({
     }, 300);
   };
 
+  // ADD: Reset errors when modal becomes visible
+  React.useEffect(() => {
+    if (visible) {
+      resetImageErrors();
+    }
+  }, [visible]);
+
   return (
     <Modal
       visible={visible}
@@ -186,9 +207,13 @@ export default function MemoryDetailView({
                 >
                   {mediaItem.type === 'image' ? (
                     <Image 
-                      source={{ uri: mediaItem.uri }} 
+                      source={imageErrors[mediaItem.uri] 
+                        ? require('@/assets/images/fallbackImage.png') 
+                        : { uri: mediaItem.uri }
+                      } 
                       style={styles.galleryImage}
                       resizeMode="cover"
+                      onError={() => handleImageError(mediaItem.uri)}
                     />
                   ) : (
                     <View style={styles.videoPlaceholder}>

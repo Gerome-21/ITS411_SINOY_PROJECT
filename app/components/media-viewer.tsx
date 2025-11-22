@@ -42,6 +42,7 @@ export default function MediaViewer() {
     durationMillis: 0 
   });
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // ADD: Track image errors
   const videoRef = useRef<Video>(null);
   
   // Parse media data from URL params
@@ -77,6 +78,19 @@ export default function MediaViewer() {
     };
     loadMediaUri();
   }, [currentMedia]);
+
+  // ADD: Handle image loading errors
+  const handleImageError = (mediaUri: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [mediaUri]: true
+    }));
+  };
+
+  // ADD: Reset image errors when media changes
+  const resetImageErrors = () => {
+    setImageErrors({});
+  };
 
   // Handle video playback
   useEffect(() => {
@@ -150,6 +164,7 @@ export default function MediaViewer() {
       }
       setCurrentIndex(currentIndex + 1);
       setShowControls(true);
+      resetImageErrors(); // ADD: Reset errors when changing media
     }
   };
 
@@ -162,6 +177,7 @@ export default function MediaViewer() {
       }
       setCurrentIndex(currentIndex - 1);
       setShowControls(true);
+      resetImageErrors(); // ADD: Reset errors when changing media
     }
   };
 
@@ -219,9 +235,13 @@ export default function MediaViewer() {
       >
         {currentMedia.type === 'image' ? (
           <Image 
-            source={{ uri: currentMediaUri }} 
+            source={imageErrors[currentMediaUri] 
+              ? require('@/assets/images/fallbackImage.png') 
+              : { uri: currentMediaUri }
+            } 
             style={styles.media}
             resizeMode="contain"
+            onError={() => handleImageError(currentMediaUri)}
           />
         ) : (
           <View style={styles.videoContainer}>
@@ -353,13 +373,18 @@ export default function MediaViewer() {
                     await videoRef.current.setPositionAsync(0);
                   }
                   setCurrentIndex(index);
+                  resetImageErrors(); // ADD: Reset errors when changing media via thumbnails
                 }}
               >
                 {item.type === 'image' ? (
                   <Image 
-                    source={{ uri: item.uri }} 
+                    source={imageErrors[item.uri] 
+                      ? require('@/assets/images/fallbackImage.png') 
+                      : { uri: item.uri }
+                    } 
                     style={styles.thumbnailImage}
                     resizeMode="cover"
+                    onError={() => handleImageError(item.uri)}
                   />
                 ) : (
                   <View style={styles.thumbnailVideo}>

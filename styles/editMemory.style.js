@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLOR.background,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -38,35 +38,34 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   section: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLOR.border,
+    paddingHorizontal: 16,
+    paddingVertical:8
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: COLOR.text,
     marginBottom: 12,
   },
   input: {
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLOR.border,
+    borderColor: COLOR.primary,
     color: COLOR.text,
-    fontSize: 16,
+    fontSize: 14,
   },
   textArea: {
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLOR.border,
+    borderColor: COLOR.primary,
     color: COLOR.text,
-    fontSize: 16,
+    fontSize: 14,
     minHeight: 100,
     textAlignVertical: 'top',
   },
@@ -78,7 +77,7 @@ export const styles = StyleSheet.create({
   mediaButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
@@ -97,9 +96,8 @@ export const styles = StyleSheet.create({
     width: 150,
     height: 150,
     margin: 8,
-    borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
   },
   mediaItemContent: {
     width: '100%',
@@ -114,7 +112,7 @@ export const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
   },
   videoText: {
     marginTop: 8,
@@ -153,79 +151,108 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLOR.cardBackground,
+    backgroundColor: COLOR.background,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLOR.border,
+    borderColor: COLOR.primary,
   },
   dateButtonText: {
     color: COLOR.text,
-    fontSize: 16,
+    fontSize: 14,
   },
-  feelingSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: COLOR.cardBackground,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLOR.border,
-  },
-  feelingSelectorText: {
-    color: COLOR.text,
-    fontSize: 16,
-  },
-  feelingPicker: {
-    backgroundColor: COLOR.cardBackground,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLOR.border,
-    marginTop: 8,
-    maxHeight: 200,
-  },
-  feelingScrollView: {
-    padding: 8,
-  },
-  feelingOption: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 6,
-  },
-  feelingOptionSelected: {
-    backgroundColor: COLOR.primary + '20',
-  },
-  feelingOptionText: {
-    fontSize: 16,
-    color: COLOR.text,
-  },
-  albumSelector: {
-    marginBottom: 12,
-  },
-  albumInput: {
-    backgroundColor: COLOR.cardBackground,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLOR.border,
-    color: COLOR.text,
-    fontSize: 16,
-  },
-  albumChips: {
+  // REMOVED: Old feeling selector styles
+  // feelingSelector: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   backgroundColor: COLOR.background,
+  //   paddingHorizontal: 16,
+  //   paddingVertical: 12,
+  //   borderRadius: 8,
+  //   borderWidth: 1,
+  //   borderColor: COLOR.primary,
+  // },
+  // feelingSelectorText: {
+  //   color: COLOR.text,
+  //   fontSize: 14,
+  // },
+  // feelingPicker: {
+  //   backgroundColor: COLOR.background,
+  //   borderRadius: 8,
+  //   borderWidth: 1,
+  //   borderColor: COLOR.primary,
+  //   marginTop: 8,
+  //   maxHeight: 200,
+  // },
+  // feelingScrollView: {
+  //   padding: 8,
+  // },
+  // feelingOption: {
+  //   paddingHorizontal: 12,
+  //   paddingVertical: 12,
+  //   borderRadius: 6,
+  // },
+  // feelingOptionSelected: {
+  //   backgroundColor: COLOR.primary + '20',
+  // },
+  // feelingOptionText: {
+  //   fontSize: 14,
+  //   color: COLOR.text,
+  // },
+  
+  // ADDED: New feeling chips styles (similar to album chips)
+  feelingChips: {
     flexGrow: 0,
+    marginBottom: 20,
   },
-  albumChip: {
-    backgroundColor: COLOR.cardBackground,
+  feelingChip: {
+    backgroundColor: COLOR.background,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: COLOR.border,
+    borderColor: COLOR.primary,
+  },
+  feelingChipSelected: {
+    backgroundColor: COLOR.primary,
+    borderColor: COLOR.primary,
+  },
+  feelingChipText: {
+    color: COLOR.text,
+    fontSize: 14,
+  },
+  feelingChipTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  albumSelector: {
+    marginBottom: 12,
+  },
+  albumInput: {
+    backgroundColor: COLOR.background,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLOR.primary,
+    color: COLOR.text,
+    fontSize: 14,
+  },
+  albumChips: {
+    flexGrow: 0,
+    marginBottom:20
+  },
+  albumChip: {
+    backgroundColor: COLOR.background,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: COLOR.primary,
   },
   albumChipSelected: {
     backgroundColor: COLOR.primary,

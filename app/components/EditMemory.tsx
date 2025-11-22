@@ -66,8 +66,8 @@ export default function EditMemory({
   
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showFeelingPicker, setShowFeelingPicker] = useState(false);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // ADD: Track image errors
   
   const [formData, setFormData] = useState({
     title: memory.title,
@@ -82,6 +82,26 @@ export default function EditMemory({
   useEffect(() => {
     loadUserAlbums();
   }, []);
+
+  // ADD: Reset image errors when modal opens
+  useEffect(() => {
+    if (visible) {
+      resetImageErrors();
+    }
+  }, [visible]);
+
+  // ADD: Handle image loading errors
+  const handleImageError = (mediaUri: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [mediaUri]: true
+    }));
+  };
+
+  // ADD: Reset image errors
+  const resetImageErrors = () => {
+    setImageErrors({});
+  };
 
   const loadUserAlbums = async () => {
     if (!auth.currentUser) return;
@@ -210,6 +230,15 @@ export default function EditMemory({
       ...prev,
       media: prev.media.filter((_, i) => i !== index)
     }));
+    // ADD: Also remove the error state for the removed image
+    const removedMediaUri = formData.media[index]?.uri;
+    if (removedMediaUri) {
+      setImageErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[removedMediaUri];
+        return newErrors;
+      });
+    }
   };
 
   const openMediaViewer = (initialIndex: number) => {
@@ -296,9 +325,13 @@ export default function EditMemory({
                     >
                       {mediaItem.type === 'image' ? (
                         <Image 
-                          source={{ uri: mediaItem.uri }} 
+                          source={imageErrors[mediaItem.uri] 
+                            ? require('@/assets/images/fallbackImage.png') 
+                            : { uri: mediaItem.uri }
+                          } 
                           style={styles.galleryImage}
                           resizeMode="cover"
+                          onError={() => handleImageError(mediaItem.uri)}
                         />
                       ) : (
                         <View style={styles.videoPlaceholder}>
@@ -340,6 +373,21 @@ export default function EditMemory({
             />
           </View>
 
+          {/* Description */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Description</Text>
+            <TextInput
+              style={styles.textArea}
+              value={formData.description}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
+              placeholder="Describe your memory..."
+              placeholderTextColor={COLOR.inactive}
+              multiline
+              textAlignVertical="top"
+              numberOfLines={4}
+            />
+          </View>
+
           {/* Date */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Date of Memory</Text>
@@ -366,40 +414,35 @@ export default function EditMemory({
             )}
           </View>
 
-          {/* Feeling */}
+          {/* Feeling - UPDATED: Horizontal scroll view */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Feeling</Text>
-            <TouchableOpacity 
-              style={styles.feelingSelector}
-              onPress={() => setShowFeelingPicker(!showFeelingPicker)}
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.feelingChips}
             >
-              <Text style={styles.feelingSelectorText}>
-                {getFeelingEmoji(formData.feeling)} {formData.feeling.charAt(0).toUpperCase() + formData.feeling.slice(1)}
-              </Text>
-              <Ionicons name="chevron-down" size={16} color={COLOR.inactive} />
-            </TouchableOpacity>
-            
-            {showFeelingPicker && (
-              <View style={styles.feelingPicker}>
-                <ScrollView style={styles.feelingScrollView}>
-                  {FEELINGS.map((feeling) => (
-                    <TouchableOpacity
-                      key={feeling.value}
-                      style={[
-                        styles.feelingOption,
-                        formData.feeling === feeling.value && styles.feelingOptionSelected
-                      ]}
-                      onPress={() => {
-                        setFormData(prev => ({ ...prev, feeling: feeling.value }));
-                        setShowFeelingPicker(false);
-                      }}
-                    >
-                      <Text style={styles.feelingOptionText}>{feeling.label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
+              {FEELINGS.map((feeling) => (
+                <TouchableOpacity
+                  key={feeling.value}
+                  style={[
+                    styles.feelingChip,
+                    formData.feeling === feeling.value && styles.feelingChipSelected
+                  ]}
+                  onPress={() => setFormData(prev => ({ 
+                    ...prev, 
+                    feeling: feeling.value 
+                  }))}
+                >
+                  <Text style={[
+                    styles.feelingChipText,
+                    formData.feeling === feeling.value && styles.feelingChipTextSelected
+                  ]}>
+                    {feeling.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           {/* Album */}
@@ -441,21 +484,6 @@ export default function EditMemory({
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
-
-          {/* Description */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Description</Text>
-            <TextInput
-              style={styles.textArea}
-              value={formData.description}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
-              placeholder="Describe your memory..."
-              placeholderTextColor={COLOR.inactive}
-              multiline
-              textAlignVertical="top"
-              numberOfLines={4}
-            />
           </View>
         </ScrollView>
       </SafeAreaView>

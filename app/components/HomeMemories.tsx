@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/homeMemories.style';
 import { Memory } from '../../types/memory';
-import EditMemory from './EditMemory'; // ADD THIS IMPORT
+import EditMemory from './EditMemory';
 import MemoryDetailView from './MemoryDetailView';
 import UserProfileCard from './userProfileCard';
 
@@ -36,13 +36,13 @@ export default function HomeMemories() {
 
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
-  const [editingMemory, setEditingMemory] = useState<Memory | null>(null); // ADD THIS STATE
-  const [editModalVisible, setEditModalVisible] = useState(false); // ADD THIS STATE
-  
+  const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [groupedMemories, setGroupedMemories] = useState<GroupedMemories[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // Track image loading errors
 
   useEffect(() => {
     loadAllMemories();
@@ -81,6 +81,19 @@ export default function HomeMemories() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // ADD THIS FUNCTION: Handle image loading errors
+  const handleImageError = (mediaUri: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [mediaUri]: true
+    }));
+  };
+
+  // ADD THIS FUNCTION: Reset image error state (useful for refresh)
+  const resetImageErrors = () => {
+    setImageErrors({});
   };
 
   const getAnniversaryMemories = (memoriesList: Memory[]) => {
@@ -207,6 +220,7 @@ export default function HomeMemories() {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    resetImageErrors(); // Reset image errors on refresh
     await loadAllMemories();
     setRefreshing(false);
   };
@@ -261,31 +275,26 @@ export default function HomeMemories() {
     return feelingMap[feeling] || '😊';
   };
 
-  // FIXED: Properly handle memory update
   const handleMemoryUpdate = (updatedMemory: Memory) => {
     const updatedList = memories.map(mem => 
       mem.id === updatedMemory.id ? updatedMemory : mem
     );
     setMemories(updatedList);
-    // Re-group memories to reflect changes
     groupMemoriesByDate(updatedList);
   };
 
-  // FIXED: Properly handle memory delete
   const handleMemoryDelete = (memoryId: string) => {
     const updatedList = memories.filter(mem => mem.id !== memoryId);
     setMemories(updatedList);
-    // Re-group memories to reflect changes
     groupMemoriesByDate(updatedList);
   };
 
-  // ADD THIS FUNCTION: Handle edit memory requests
   const handleEditMemory = (memory: Memory) => {
     setEditingMemory(memory);
     setEditModalVisible(true);
   };
 
-  // FIXED: Removed nested TouchableOpacity and View
+  // UPDATED: Modified the renderMemoryItem function to include fallback image
   const renderMemoryItem = ({ item, isAnniversary = false, yearsAgo = 0 }: { item: Memory; isAnniversary?: boolean; yearsAgo?: number }) => (
     <TouchableOpacity 
       style={[styles.memoryCard, isAnniversary && styles.anniversaryCard]}
@@ -341,9 +350,13 @@ export default function HomeMemories() {
             >
               {mediaItem.type === 'image' ? (
                 <Image 
-                  source={{ uri: mediaItem.uri }} 
+                  source={imageErrors[mediaItem.uri] 
+                    ? require('@/assets/images/fallbackImage.png') 
+                    : { uri: mediaItem.uri }
+                  } 
                   style={styles.mediaImage}
                   resizeMode="cover"
+                  onError={() => handleImageError(mediaItem.uri)}
                 />
               ) : (
                 <View style={styles.videoPlaceholder}>
@@ -475,7 +488,6 @@ export default function HomeMemories() {
         />
       )}
 
-      {/* FIXED: Only render MemoryDetailView when selectedMemory exists */}
       {selectedMemory && (
         <MemoryDetailView
           memory={selectedMemory}
@@ -485,11 +497,10 @@ export default function HomeMemories() {
             setSelectedMemory(null);
           }}
           onMemoryDelete={handleMemoryDelete}
-          onEditMemory={handleEditMemory} // ADD THIS PROP
+          onEditMemory={handleEditMemory}
         />
       )}
 
-      {/* ADD THIS: Edit Memory Modal */}
       {editingMemory && (
         <EditMemory
           memory={editingMemory}
