@@ -1,4 +1,4 @@
-// styles/homeMemories.style.ts
+// styles/sharedAlbumDetails.style.ts - UPDATED
 import { COLOR } from '@/constants/colorPalette';
 import { Dimensions, StyleSheet } from 'react-native';
 
@@ -7,14 +7,9 @@ const { width } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    paddingTop: 100,
-    paddingBottom: 50,
-    flexGrow: 1,
-    gap: 30
+    backgroundColor: "#fff",
   },
-  loadingContainer: {
+ loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -25,79 +20,43 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     color: COLOR.primary,
   },
-  header: {
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  headerButton: {
+    padding: 4,
+  },
+  albumHeader: {
     backgroundColor: COLOR.background,
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  headerTitle: {
-    fontSize: 24,
+  albumTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: COLOR.secondary,
-    marginBottom: 5,
+    marginBottom: 1,
+    marginRight:50
   },
   memoryCount: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#666',
   },
   memoriesList: {
     padding: 20,
-  },
-  section: {
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLOR.inactive,
-    marginBottom: 25,
-    paddingLeft: 10,
-  },
-  anniversarySectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLOR.primary,
-    textAlign: 'center',
-    marginBottom: 20,
   },
   memoryCard: {
     backgroundColor: COLOR.background,
     borderRadius: 12,
     padding: 15,
     marginBottom: 20,
-    shadowColor: COLOR.secondary,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  anniversaryCard: {
-    backgroundColor: COLOR.background,
-    borderWidth: 2,
-    borderColor: COLOR.primary,
-    shadowColor: COLOR.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  anniversaryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLOR.background,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginBottom: 12,
-    alignSelf: 'center',
-  },
-  anniversaryBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLOR.primary,
-    marginHorizontal: 6,
   },
   memoryHeader: {
     flexDirection: 'row',
@@ -107,6 +66,7 @@ export const styles = StyleSheet.create({
   },
   memoryInfo: {
     flex: 1,
+    marginRight:50
   },
   memoryTitle: {
     fontSize: 18,
@@ -115,13 +75,10 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
     marginRight:20
   },
-  anniversaryTitle: {
-    color: COLOR.secondary,
-    fontSize: 20,
-  },
-  memoryDate: {
+  memoryAuthor: {
     fontSize: 14,
     color: '#666',
+    fontStyle: 'italic',
   },
   memoryMeta: {
     alignItems: 'flex-end',
@@ -133,10 +90,6 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
     fontSize: 12,
     fontWeight: '600',
-    color: COLOR.secondary,
-  },
-  anniversaryFeeling: {
-    backgroundColor: '#fff',
     color: COLOR.primary,
   },
   memoryDescription: {
@@ -145,27 +98,23 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 8,
   },
-  anniversaryDescription: {
-    color: COLOR.secondary,
-    fontSize: 14,
-    lineHeight: 20
-  },
   mediaScrollView: {
     marginBottom: 15,
   },
   mediaContainer: {
     marginRight: 10,
+    position: 'relative',
   },
   mediaImage: {
-    width: 70,
+    width: 90,
     height: 70,
-    borderRadius: 0,
+    borderRadius: 8,
   },
   videoPlaceholder: {
     width: 90,
     height: 70,
     backgroundColor: '#e9ecef',
-    borderRadius: 0,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -178,33 +127,27 @@ export const styles = StyleSheet.create({
     color: '#666',
     fontWeight: '600',
   },
+  videoBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  videoBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   memoryFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#fff',
+    borderTopColor: '#f0f0f0',
     paddingTop: 10,
-  },
-  albumBadge: {
-    fontSize: 10,
-    color: COLOR.primary,
-    backgroundColor: '#fff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  createdDate: {
-    fontSize: 10,
-    color: COLOR.primary,
-    backgroundColor: '#fff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  anniversaryFooterText: {
-    backgroundColor: '#FFF',
-    color: COLOR.primary,
   },
   footerItem: {
     flexDirection: 'row',
@@ -214,15 +157,33 @@ export const styles = StyleSheet.create({
   footerIcon: {
     marginRight: 3,
   },
+  createdDate: {
+    fontSize: 10,
+    color: COLOR.primary,
+    backgroundColor: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#f8f9fa',
+  },
+  editButtonText: {
+    fontSize: 10,
+    color: COLOR.primary,
+    fontWeight: '500',
+  },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 50,
-  },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 20,
   },
   emptyStateText: {
     fontSize: 18,
@@ -240,7 +201,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   createMemoryButton: {
-    backgroundColor: COLOR.secondary,
+    backgroundColor: COLOR.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
@@ -250,26 +211,46 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  videoBadge: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+  backButton: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: COLOR.primary,
+    borderRadius: 8,
   },
-  videoBadgeText: {
+  backButtonText: {
     color: '#fff',
-    fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
-  emptyStateContainer: {
-  flex: 1,
-  justifyContent: 'center',
+  albumHeader: {
+  flexDirection: 'row',
   alignItems: 'center',
-  paddingHorizontal: 20,
-  marginTop: 50,
+  justifyContent: 'space-between',
+  paddingHorizontal: 15,
+  paddingVertical: 18,
+  backgroundColor: "#fff",
+  borderBottomWidth: 1,
+  borderBottomColor: '#e3e3e3',
+},
+
+albumHeaderLeft: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  flex: 1,
+},
+albumHeaderText: {
+  flexDirection: 'column',
+},
+
+albumHeaderRight: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+},
+
+headerIconButton: {
+  padding: 4,
 },
 
 });

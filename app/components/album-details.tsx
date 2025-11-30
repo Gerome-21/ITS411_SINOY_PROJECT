@@ -281,8 +281,7 @@ export default function AlbumDetails() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Stack.Screen options={{ title: 'Loading...' }} />
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLOR.primary} />
         <Text style={styles.loadingText}>Loading memories...</Text>
       </View>
@@ -298,10 +297,20 @@ export default function AlbumDetails() {
 
       {/* Album Header */}
       <View style={styles.albumHeader}>
-        <Text style={styles.albumTitle}>{albumName || 'Uncategorized'}</Text>
-        <Text style={styles.memoryCount}>
-          {memories.length} {memories.length === 1 ? 'memory' : 'memories'}
-        </Text>
+        <View style={styles.albumHeaderLeft}>
+          {/* BACK BUTTON */}
+          <TouchableOpacity onPress={() => router.back()} >
+            <Ionicons name="chevron-back-outline" size={25} color={COLOR.secondary} />
+          </TouchableOpacity>
+
+          {/* TITLE + DETAILS */}
+          <View style={styles.albumHeaderText}>
+            <Text style={styles.albumTitle}>{albumName || 'Uncategorized'}</Text>
+            <Text style={styles.memoryCount}>
+              {memories.length} {memories.length === 1 ? 'memory' : 'memories'}
+            </Text>
+          </View>
+        </View>
       </View>
 
       {memories.length === 0 ? (

@@ -1,3 +1,4 @@
+//app/_layout.tsx
 import { getAuth, onAuthStateChanged, User } from '@react-native-firebase/auth';
 import { Stack } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';

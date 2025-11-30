@@ -9,25 +9,35 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   loadingText: {
     marginTop: 10,
     textAlign: 'center',
-    color: '#666',
+    color: COLOR.primary,
   },
   albumHeader: {
-    backgroundColor: COLOR.background,
-    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingVertical: 18,
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#e3e3e3',
   },
   albumTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: COLOR.secondary,
-    marginBottom: 5,
+    marginBottom: 1,
   },
   memoryCount: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#666',
   },
   memoriesList: {
@@ -186,5 +196,14 @@ videoBadgeText: {
   color: '#fff',
   fontSize: 10,
   fontWeight: 'bold',
+},
+albumHeaderLeft: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  flex: 1,
+},
+albumHeaderText: {
+  flexDirection: 'column',
 },
 });

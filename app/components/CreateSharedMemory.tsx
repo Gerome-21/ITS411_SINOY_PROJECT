@@ -1,12 +1,13 @@
-// app/(tabs)/createMemory.tsx
+// app/components/CreateSharedMemory.tsx - UPDATED
 import { COLOR } from '@/constants/colorPalette';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getAuth } from '@react-native-firebase/auth';
-import { addDoc, collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore';
+import { addDoc, collection, doc, getDoc, getFirestore, updateDoc } from '@react-native-firebase/firestore';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,13 +18,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { styles } from '../../styles/createMemory';
-import { Album, FeelingType, Memory } from '../../types/memory';
-import AlbumSelectorModal from '../components/AlbumSelectorModal';
-import AppHeader from '../components/appHeader';
+import { styles } from '../../styles/createSharedMemory.style';
+import { FeelingType, SharedMemory } from '../../types/memory';
+import AppHeader from './appHeader';
 
 const FEELINGS: { value: FeelingType; label: string }[] = [
-  // Positive Feelings
   { value: 'happy', label: '😊 Happy' },
   { value: 'excited', label: '🤩 Excited' },
   { value: 'grateful', label: '🙏 Grateful' },
@@ -33,15 +32,11 @@ const FEELINGS: { value: FeelingType; label: string }[] = [
   { value: 'hopeful', label: '🌈 Hopeful' },
   { value: 'inspired', label: '💡 Inspired' },
   { value: 'proud', label: '🏆 Proud' },
-
-  // Neutral or Mixed Feelings
   { value: 'bored', label: '😴 Bored' },
   { value: 'curious', label: '🧐 Curious' },
   { value: 'thoughtful', label: '🤔 Thoughtful' },
   { value: 'nostalgic', label: '📸 Nostalgic' },
   { value: 'calm', label: '🌿 Calm' },
-
-  // Negative Feelings
   { value: 'sad', label: '😢 Sad' },
   { value: 'angry', label: '😠 Angry' },
   { value: 'anxious', label: '😰 Anxious' },
@@ -52,8 +47,9 @@ const FEELINGS: { value: FeelingType; label: string }[] = [
   { value: 'disappointed', label: '😞 Disappointed' },
 ];
 
-
-export default function CreateMemory() {
+export default function CreateSharedMemory() {
+  const { albumDocId, albumId, albumName } = useLocalSearchParams();
+  const router = useRouter();
   const auth = getAuth();
   const db = getFirestore();
 
@@ -61,41 +57,12 @@ export default function CreateMemory() {
     title: '',
     description: '',
     dateOfMemory: new Date(),
-    albumId: 'uncategorized',
-    albumName: 'Uncategorized',
-    newAlbumName: '',
     feeling: 'happy' as FeelingType,
   });
   
   const [media, setMedia] = useState<{ uri: string; type: 'image' | 'video' | 'audio'; fileName: string }[]>([]);
-  const [albums, setAlbums] = useState<Album[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showAlbumModal, setShowAlbumModal] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    loadUserAlbums();
-  }, []);
-
-  const loadUserAlbums = async () => {
-    if (!auth.currentUser) return;
-    
-    try {
-      const albumsQuery = query(
-        collection(db, 'albums'),
-        where('userId', '==', auth.currentUser.uid)
-      );
-      const snapshot = await getDocs(albumsQuery);
-      const userAlbums = snapshot.docs.map((doc: { id: any; data: () => any; }) => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Album[];
-      
-      setAlbums(userAlbums);
-    } catch (error) {
-      console.error('Error loading albums:', error);
-    }
-  };
 
   const pickMedia = async (type: 'image' | 'video' | 'audio') => {
     try {
@@ -117,7 +84,7 @@ export default function CreateMemory() {
         const newMedia = result.assets.map(asset => ({
           uri: asset.uri,
           type,
-          fileName: asset.fileName || `memory_${Date.now()}.${type}`,
+          fileName: asset.fileName || `shared_memory_${Date.now()}.${type}`,
         }));
         setMedia(prev => [...prev, ...newMedia]);
       }
@@ -126,140 +93,147 @@ export default function CreateMemory() {
     }
   };
 
-  // Copy file to app's local directory (Documents on device)
   const saveMediaLocally = async (uri: string, fileName: string): Promise<string> => {
     try {
-      // Create a local directory for memories if it doesn't exist
-      const memoriesDir = `${FileSystem.documentDirectory}memories/`;
+      const memoriesDir = `${FileSystem.documentDirectory}shared_memories/`;
       const dirInfo = await FileSystem.getInfoAsync(memoriesDir);
       if (!dirInfo.exists) {
         await FileSystem.makeDirectoryAsync(memoriesDir, { intermediates: true });
       }
 
-      // Copy the file to local storage
       const localUri = `${memoriesDir}${Date.now()}_${fileName}`;
       await FileSystem.copyAsync({
         from: uri,
         to: localUri,
       });
 
-      return localUri; // Return local path reference
+      return localUri;
     } catch (error) {
       console.error('Error saving media locally:', error);
-      // If local saving fails, fall back to the original URI
       return uri;
     }
   };
 
-  const createAlbum = async (albumName: string): Promise<string> => {
-    if (!auth.currentUser) throw new Error('User not authenticated');
+  const handleSubmit = async () => {
+  if (!formData.title.trim()) {
+    Alert.alert('Error', 'Please enter a title for your memory');
+    return;
+  }
 
-    const albumData: Omit<Album, 'id'> = {
-      userId: auth.currentUser.uid,
-      name: albumName,
-      memoryCount: 0,
+  if (media.length === 0) {
+    Alert.alert('Error', 'Please add at least one photo or video');
+    return;
+  }
+
+  if (!auth.currentUser) {
+    Alert.alert('Error', 'User not authenticated');
+    return;
+  }
+
+  if (!albumDocId) {
+    Alert.alert('Error', 'Album reference missing');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // NEW: Get user's actual name from Firestore
+    const userName = await getUserName(auth.currentUser.uid);
+
+    // Save media files locally
+    const savedMedia = await Promise.all(
+      media.map(async (item) => {
+        const localUri = await saveMediaLocally(item.uri, item.fileName);
+        return {
+          type: item.type,
+          uri: localUri,
+          fileName: item.fileName,
+        };
+      })
+    );
+
+    // Create shared memory document with albumDocId
+    const memoryData: Omit<SharedMemory, 'id'> = {
+      albumDocId: albumDocId as string,
+      albumId: albumId as string,
+      albumName: albumName as string,
       createdAt: new Date(),
+      dateOfMemory: formData.dateOfMemory,
+      description: formData.description.trim(),
+      feeling: formData.feeling,
+      media: savedMedia,
+      title: formData.title.trim(),
+      userId: auth.currentUser.uid,
+      username: userName // Use actual name from Firestore
     };
 
-    const docRef = await addDoc(collection(db, 'albums'), albumData);
-    return docRef.id;
-  };
+    // SECURE: Firestore rules will validate access to parent album
+    await addDoc(collection(db, 'sharedMemories'), memoryData);
 
-  const handleSubmit = async () => {
-    if (!formData.title.trim()) {
-      Alert.alert('Error', 'Please enter a title for your memory');
-      return;
-    }
-
-    if (media.length === 0) {
-      Alert.alert('Error', 'Please add at least one photo, video, or audio');
-      return;
-    }
-
-    if (!auth.currentUser) {
-      Alert.alert('Error', 'User not authenticated');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      let albumId = formData.albumId;
-      let albumName = formData.albumName;
-
-      // Create new album if specified
-      if (formData.newAlbumName.trim() && formData.albumId === 'new') {
-        albumId = await createAlbum(formData.newAlbumName);
-        albumName = formData.newAlbumName;
-        await loadUserAlbums(); // Refresh albums list
-      }
-
-      // Save media files locally and get their paths
-      const savedMedia = await Promise.all(
-        media.map(async (item, index) => {
-          const localUri = await saveMediaLocally(item.uri, item.fileName);
-          return {
-            type: item.type,
-            uri: localUri, // This is now a local file path
-            fileName: item.fileName,
-          };
-        })
-      );
-
-      // Create memory document with local file references
-      const memoryData: Omit<Memory, 'id'> = {
-        userId: auth.currentUser.uid,
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        dateOfMemory: formData.dateOfMemory,
-        media: savedMedia,
-        albumId,
-        albumName,
-        feeling: formData.feeling,
-        createdAt: new Date(),
-      };
-
-      await addDoc(collection(db, 'memories'), memoryData);
-
-      Alert.alert('Success', 'Memory created successfully!');
-      
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        dateOfMemory: new Date(),
-        albumId: 'uncategorized',
-        albumName: 'Uncategorized',
-        newAlbumName: '',
-        feeling: 'happy',
+    // Update memory count in shared album
+    const albumRef = doc(db, 'sharedAlbums', albumDocId as string);
+    const albumDoc = await getDoc(albumRef);
+    if (albumDoc.exists()) {
+      const currentCount = albumDoc.data().memoryCount || 0;
+      await updateDoc(albumRef, {
+        memoryCount: currentCount + 1
       });
-      setMedia([]);
-      
-    } catch (error) {
-      console.error('Error creating memory:', error);
-      Alert.alert('Error', 'Failed to create memory');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    Alert.alert('Success', 'Memory added to shared folder!');
+    router.back();
+    
+  } catch (error: any) {
+    console.error('Error creating shared memory:', error);
+    if (error.code === 'permission-denied') {
+      Alert.alert('Access Denied', 'You do not have permission to add memories to this album.');
+    } else {
+      Alert.alert('Error', error.message || 'Failed to create shared memory');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+const getUserName = async (userId: string): Promise<string> => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      return userData.name || auth.currentUser?.displayName || 'User';
+    }
+    return auth.currentUser?.displayName || 'User';
+  } catch (error) {
+    console.error('Error fetching user name:', error);
+    return auth.currentUser?.displayName || 'User';
+  }
+};
 
   const removeMedia = (index: number) => {
     setMedia(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Rest of your component JSX remains the same...
   return (
     <View style={styles.container}>
-      <AppHeader/>
+      <AppHeader />
       
-       <ScrollView 
+      <ScrollView 
         style={styles.scrollArea} 
-        contentContainerStyle={{ paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* <Text style={styles.title}>Add Memory</Text> */}
+        <View style={styles.infoBox}>
+          <Ionicons name="information-circle" size={20} color={COLOR.primary} />
+          <View style={styles.infoContent}>
+            <Text style={styles.infoTitle}>Shared Folder Memory</Text>
+            <Text style={styles.infoText}>
+              • Only you can edit or delete this memory{'\n'}
+              • Other members can view but not modify{'\n'}
+              • All members will see this memory in the shared folder
+            </Text>
+          </View>
+        </View>
 
-        {/* Title */}
         <Text style={styles.label}>Title *</Text>
         <TextInput
           style={styles.input}
@@ -269,7 +243,6 @@ export default function CreateMemory() {
           placeholderTextColor={COLOR.inactive}
         />
 
-        {/* Description */}
         <Text style={styles.label}>Description</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
@@ -281,7 +254,6 @@ export default function CreateMemory() {
           placeholderTextColor={COLOR.inactive}
         />
 
-        {/* Date of Memory */}
         <Text style={styles.label}>Date of Memory</Text>
         <TouchableOpacity 
           style={styles.dateButton}
@@ -303,67 +275,6 @@ export default function CreateMemory() {
           />
         )}
 
-        {/* Album Selection */}
-        <Text style={styles.label}>Album</Text>
-        <TouchableOpacity 
-          style={styles.dropdown}
-          onPress={() => setShowAlbumModal(true)}
-        >
-          <Text>{formData.albumName}</Text>
-        </TouchableOpacity>
-
-        {/* Add this ALWAYS VISIBLE "Create New Album" button */}
-        <TouchableOpacity 
-          style={styles.createAlbumButton}
-          onPress={() => {
-            setFormData(prev => ({ 
-              ...prev, 
-              albumId: 'new', 
-              albumName: 'Create New Album' 
-            }));
-            setShowAlbumModal(false);
-          }}
-        >
-          <Text style={styles.createAlbumButtonText}>+ Create New Album</Text>
-        </TouchableOpacity>
-
-        <AlbumSelectorModal
-          visible={showAlbumModal}
-          albums={albums}
-          onClose={() => setShowAlbumModal(false)}
-          onSelect={(album) => {
-            setFormData((prev) => ({
-              ...prev,
-              albumId: album?.id || 'uncategorized',
-              albumName: album?.name || 'Uncategorized',
-              newAlbumName: '',
-            }));
-          }}
-          onCreateNew={() => {
-            setFormData((prev) => ({
-              ...prev,
-              albumId: 'new',
-              albumName: 'Create New Album',
-            }));
-            setShowAlbumModal(false);
-          }}
-        />
-
-
-        {/* New Album Input */}
-        {formData.albumId === 'new' && (
-          <>
-            <Text style={styles.label}>New Album Name</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.newAlbumName}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, newAlbumName: text }))}
-              placeholder="Enter album name"
-            />
-          </>
-        )}
-
-        {/* Feeling Selection */}
         <Text style={styles.label}>Feeling</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {FEELINGS.map((feeling) => (
@@ -375,29 +286,29 @@ export default function CreateMemory() {
               ]}
               onPress={() => setFormData(prev => ({ ...prev, feeling: feeling.value }))}
             >
-              <Text>{feeling.label}</Text>
+              <Text style={styles.feelingButtonText}>{feeling.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        {/* Media Upload */}
         <Text style={styles.label}>Upload Media *</Text>
         <View style={styles.mediaButtons}>
           <TouchableOpacity 
             style={styles.mediaButton}
             onPress={() => pickMedia('image')}
           >
-            <Ionicons name='image' size={20} color={COLOR.primary}/> 
+            <Ionicons name='image' size={20} color={COLOR.primary} /> 
+            <Text style={styles.mediaButtonText}>Photos</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.mediaButton}
             onPress={() => pickMedia('video')}
           >
-            <Ionicons name='videocam' size={20} color={COLOR.primary}/>
+            <Ionicons name='videocam' size={20} color={COLOR.primary} />
+            <Text style={styles.mediaButtonText}>Videos</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Media Preview */}
         <View style={styles.mediaPreview}>
           {media.map((item, index) => (
             <View key={index} style={styles.mediaItem}>
@@ -405,7 +316,7 @@ export default function CreateMemory() {
                 <Image source={{ uri: item.uri }} style={styles.mediaImage} />
               ) : (
                 <View style={styles.mediaPlaceholder}>
-                  <Ionicons name='play-circle-outline' size={30}/>
+                  <Ionicons name='play-circle-outline' size={30} color="#fff" />
                 </View>
               )}
               <TouchableOpacity 
@@ -418,7 +329,6 @@ export default function CreateMemory() {
           ))}
         </View>
 
-        {/* Submit Button */}
         <TouchableOpacity 
           style={[styles.submitButton, loading && styles.submitButtonDisabled]}
           onPress={handleSubmit}
@@ -427,12 +337,10 @@ export default function CreateMemory() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Save Memory</Text>
+            <Text style={styles.submitButtonText}>Done</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
-
     </View>
-    
   );
 }

@@ -1,3 +1,4 @@
+//app/index.tsx
 import { doc, getDoc, getFirestore } from '@react-native-firebase/firestore';
 import { Redirect } from 'expo-router';
 import React, { useEffect, useState } from 'react';

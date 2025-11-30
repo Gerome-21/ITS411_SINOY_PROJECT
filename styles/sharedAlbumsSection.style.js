@@ -1,13 +1,13 @@
-// styles/albumsGrid.style.js
+// styles/sharedAlbumsSection.style.ts
 import { COLOR } from '@/constants/colorPalette';
 import { Dimensions, StyleSheet } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_GAP = 8;
-const CARD_WIDTH = (width - (CARD_GAP * 5)) / 4; // 4 columns
+const CARD_WIDTH = (width - (CARD_GAP * 5)) / 4;
 
 export const styles = StyleSheet.create({
-  gridContainer: {
+  sectionContainer: {
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 12,
@@ -18,16 +18,35 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  gridHeader: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  gridTitle: {
+  sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: COLOR.secondary,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLOR.background,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 4,
+  },
+  actionButtonText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLOR.primary,
   },
   refreshButton: {
     backgroundColor: COLOR.background,
@@ -36,7 +55,7 @@ export const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: COLOR.secondary,
+    shadowColor: COLOR.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -69,10 +88,22 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    position: 'relative',
   },
   albumIcon: {
-    fontSize: 24,
+    fontSize: 22,
     color: COLOR.secondary
+  },
+  ownerBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: COLOR.primary,
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   albumName: {
     fontSize: 12,
@@ -81,10 +112,11 @@ export const styles = StyleSheet.create({
     width: '100%',
     color: COLOR.secondary,
   },
-  albumCount: {
-    fontSize: 9,
-    color: COLOR.inactive,
+  membersCount: {
+    fontSize: 8,
+    color: COLOR.link,
     textAlign: 'center',
+    fontWeight: '500',
   },
   loadingContainer: {
     paddingVertical: 30,
@@ -97,41 +129,56 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyState: {
-    paddingVertical: 40,
+    paddingVertical: 30,
     alignItems: 'center',
-    minHeight: 200,
+    minHeight: 150,
   },
-  emptyStateText: {
-    fontSize: 18,
+  emptyStateTitle: {
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
     color: COLOR.secondary,
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: 12,
   },
-  emptyStateSubtext: {
-    fontSize: 14,
+  emptyStateText: {
+    fontSize: 12,
     color: COLOR.inactive,
     textAlign: 'center',
     marginBottom: 20,
-    lineHeight: 20,
+    lineHeight: 16,
     paddingHorizontal: 20,
   },
-  createMemoryLink: {
-    backgroundColor: COLOR.primary,
-    justifyContent:'center',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  emptyStateButtons: {
+    flexDirection: 'row',
+    gap: 10,
   },
-  createMemoryLinkText: {
+  primaryButton: {
+    backgroundColor: COLOR.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  primaryButtonText: {
     color: '#fff',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 12,
   },
+  secondaryButton: {
+    backgroundColor: COLOR.background,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLOR.primary,
+  },
+  secondaryButtonText: {
+    color: COLOR.primary,
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  ownerText:{
+    color: COLOR.primary,
+    fontSize: 14
+  }
 });

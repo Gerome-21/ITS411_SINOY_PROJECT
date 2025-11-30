@@ -1,9 +1,10 @@
 // app/(tabs)/albums.tsx
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { styles } from '../../styles/albums.style';
 import AlbumsGrid from '../components/albumsGrid';
 import AppHeader from '../components/appHeader';
+import SharedAlbumsSection from '../components/SharedAlbumsSection'; // NEW
 
 export default function Albums() {
   return (
@@ -18,15 +19,12 @@ export default function Albums() {
         showsVerticalScrollIndicator={false}
       >
         
-        {/* Albums Grid - grows with content, not scrollable */}
+        {/* Personal Albums Grid */}
         <AlbumsGrid />
         
-        {/* Future components will go here and be scrollable */}
-        <View style={styles.futureContent}>
-          <Text style={styles.futureContentText}>
-            Shared albums will be appear here
-          </Text>
-        </View>
+        {/* NEW: Shared Folder Section */}
+        <SharedAlbumsSection />
+        
       </ScrollView>
     </View>
   );

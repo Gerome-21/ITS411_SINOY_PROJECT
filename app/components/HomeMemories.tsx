@@ -1,4 +1,4 @@
-// app/components/HomeMemories.tsx
+// app/components/HomeMemories.tsx 
 import { COLOR } from '@/constants/colorPalette';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from '@react-native-firebase/auth';
@@ -42,7 +42,7 @@ export default function HomeMemories() {
   const [groupedMemories, setGroupedMemories] = useState<GroupedMemories[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({}); // Track image loading errors
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     loadAllMemories();
@@ -55,10 +55,11 @@ export default function HomeMemories() {
     }
 
     try {
+      // FIXED: Sort by createdAt instead of dateOfMemory
       const memoriesQuery = query(
         collection(db, 'memories'),
         where('userId', '==', auth.currentUser.uid),
-        orderBy('dateOfMemory', 'desc')
+        orderBy('createdAt', 'desc') // CHANGED: This is the key fix!
       );
 
       const snapshot = await getDocs(memoriesQuery);
@@ -74,7 +75,7 @@ export default function HomeMemories() {
       });
       
       setMemories(allMemories);
-      groupMemoriesByDate(allMemories);
+      groupMemoriesByCreationDate(allMemories); // CHANGED: Use new function
     } catch (error) {
       console.error('Error loading memories:', error);
       Alert.alert('Error', 'Failed to load memories');
@@ -83,7 +84,6 @@ export default function HomeMemories() {
     }
   };
 
-  // ADD THIS FUNCTION: Handle image loading errors
   const handleImageError = (mediaUri: string) => {
     setImageErrors(prev => ({
       ...prev,
@@ -91,7 +91,6 @@ export default function HomeMemories() {
     }));
   };
 
-  // ADD THIS FUNCTION: Reset image error state (useful for refresh)
   const resetImageErrors = () => {
     setImageErrors({});
   };
@@ -127,7 +126,8 @@ export default function HomeMemories() {
     return yearsDiff;
   };
 
-  const groupMemoriesByDate = (memoriesList: Memory[]) => {
+  // NEW FUNCTION: Group by creation date instead of experience date
+  const groupMemoriesByCreationDate = (memoriesList: Memory[]) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -165,7 +165,7 @@ export default function HomeMemories() {
         });
     }
 
-    // Then add regular time-based groups
+    // Then add regular time-based groups - GROUP BY CREATED AT DATE
     const todayMemories: Memory[] = [];
     const thisWeekMemories: Memory[] = [];
     const thisMonthMemories: Memory[] = [];
@@ -176,17 +176,18 @@ export default function HomeMemories() {
       !anniversaryMemories.some(anniversary => anniversary.id === memory.id)
     );
 
+    // CHANGED: Use createdAt date for grouping instead of dateOfMemory
     regularMemories.forEach(memory => {
-      const memoryDate = memory.dateOfMemory?.toDate ? memory.dateOfMemory.toDate() : new Date(memory.dateOfMemory);
+      const creationDate = memory.createdAt?.toDate ? memory.createdAt.toDate() : new Date(memory.createdAt);
       
-      if (memoryDate >= today) {
+      if (creationDate >= today) {
         todayMemories.push(memory);
-      } else if (memoryDate >= oneWeekAgo) {
+      } else if (creationDate >= oneWeekAgo) {
         thisWeekMemories.push(memory);
-      } else if (memoryDate >= oneMonthAgo) {
+      } else if (creationDate >= oneMonthAgo) {
         thisMonthMemories.push(memory);
       } else {
-        const monthYear = memoryDate.toLocaleDateString('en-US', { 
+        const monthYear = creationDate.toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long' 
         });
@@ -197,7 +198,7 @@ export default function HomeMemories() {
       }
     });
 
-    // Add regular groups in order
+    // Add regular groups in order - they're already sorted by createdAt from the query
     if (todayMemories.length > 0) {
       groups.push({ title: 'Today', data: todayMemories, type: 'regular' });
     }
@@ -208,7 +209,7 @@ export default function HomeMemories() {
       groups.push({ title: 'This Month', data: thisMonthMemories, type: 'regular' });
     }
 
-    // Add older months in chronological order (newest first)
+    // Add older months - but keep the original order within each month
     Object.keys(olderMemories)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .forEach(monthYear => {
@@ -220,7 +221,7 @@ export default function HomeMemories() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    resetImageErrors(); // Reset image errors on refresh
+    resetImageErrors();
     await loadAllMemories();
     setRefreshing(false);
   };
@@ -280,13 +281,13 @@ export default function HomeMemories() {
       mem.id === updatedMemory.id ? updatedMemory : mem
     );
     setMemories(updatedList);
-    groupMemoriesByDate(updatedList);
+    groupMemoriesByCreationDate(updatedList); // CHANGED: Use new function
   };
 
   const handleMemoryDelete = (memoryId: string) => {
     const updatedList = memories.filter(mem => mem.id !== memoryId);
     setMemories(updatedList);
-    groupMemoriesByDate(updatedList);
+    groupMemoriesByCreationDate(updatedList); // CHANGED: Use new function
   };
 
   const handleEditMemory = (memory: Memory) => {
@@ -294,7 +295,6 @@ export default function HomeMemories() {
     setEditModalVisible(true);
   };
 
-  // UPDATED: Modified the renderMemoryItem function to include fallback image
   const renderMemoryItem = ({ item, isAnniversary = false, yearsAgo = 0 }: { item: Memory; isAnniversary?: boolean; yearsAgo?: number }) => (
     <TouchableOpacity 
       style={[styles.memoryCard, isAnniversary && styles.anniversaryCard]}
@@ -317,7 +317,7 @@ export default function HomeMemories() {
       {/* Memory Header */}
       <View style={styles.memoryHeader}>
         <View style={styles.memoryInfo}>
-          <Text style={[styles.memoryTitle, isAnniversary && styles.anniversaryTitle]}>{item.title}</Text>
+          <Text style={[styles.memoryTitle, isAnniversary && styles.anniversaryTitle]} numberOfLines={1}>{item.title}</Text>
         </View>
         <View style={styles.memoryMeta}>
           <Text style={[styles.feelingBadge, isAnniversary && styles.anniversaryFeeling]}>
@@ -377,7 +377,7 @@ export default function HomeMemories() {
       
       {/* Memory Description */}
       {item.description ? (
-        <Text style={[styles.memoryDescription, isAnniversary && styles.anniversaryDescription]}>
+        <Text style={[styles.memoryDescription, isAnniversary && styles.anniversaryDescription]} numberOfLines={2}>
           {item.description}
         </Text>
       ) : null}

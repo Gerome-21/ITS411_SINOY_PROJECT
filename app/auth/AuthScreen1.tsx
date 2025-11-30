@@ -1,3 +1,4 @@
+//../app/auth/AuthScreen1
 import { styles } from '@/styles/authScreen.style';
 import {
   createUserWithEmailAndPassword,

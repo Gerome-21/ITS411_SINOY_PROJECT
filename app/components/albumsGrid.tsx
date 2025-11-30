@@ -138,9 +138,12 @@ export default function AlbumsGrid() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Loading albums...</Text>
+      <View style={styles.gridContainer}>
+        <Text style={styles.gridTitle}>Shared Folders</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={COLOR.primary} />
+          <Text style={styles.loadingText}>Loading  albums...</Text>
+        </View>
       </View>
     );
   }
@@ -158,9 +161,9 @@ export default function AlbumsGrid() {
           disabled={refreshing}
         >
           {refreshing ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={COLOR.primary} />
           ) : (
-            <Ionicons name="refresh" size={20} color="#fff" />
+            <Ionicons name="refresh" size={15} color={COLOR.secondary} />
           )}
         </TouchableOpacity>
       </View>
