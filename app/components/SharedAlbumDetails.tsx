@@ -1,4 +1,4 @@
-// app/components/SharedAlbumDetails.tsx 
+// app/components/SharedAlbumDetails.tsx - FIXED SORTING
 import { COLOR } from '@/constants/colorPalette';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from '@react-native-firebase/auth';
@@ -8,6 +8,7 @@ import {
   getDoc,
   getDocs,
   getFirestore,
+  orderBy,
   query,
   where
 } from '@react-native-firebase/firestore';
@@ -94,7 +95,8 @@ export default function SharedAlbumDetails() {
     try {
       const q = query(
         collection(db, 'sharedMemories'),
-        where('albumDocId', '==', targetAlbumDocId)
+        where('albumDocId', '==', targetAlbumDocId),
+        orderBy('createdAt', 'desc') // FIXED: Sort by createdAt
       );
 
       const memoriesSnap = await getDocs(q);
@@ -107,12 +109,7 @@ export default function SharedAlbumDetails() {
         } as SharedMemory);
       });
 
-      loadedMemories.sort((a, b) => {
-        const dA = a.dateOfMemory?.toDate?.() ?? new Date(a.dateOfMemory);
-        const dB = b.dateOfMemory?.toDate?.() ?? new Date(b.dateOfMemory);
-        return dB.getTime() - dA.getTime();
-      });
-
+      // REMOVED: Manual sorting by dateOfMemory - the query already sorts by createdAt
       setSharedMemories(loadedMemories);
     } catch (err: any) {
       console.error('Error loading shared memories:', err);
